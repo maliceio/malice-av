@@ -1,4 +1,4 @@
-docker-av
+docker-escan
 =========
 
 Collection of Linux AV Dockerfiles
