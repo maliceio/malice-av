@@ -7,17 +7,14 @@ This repository contains a **Dockerfile** of [Avast](http://www.avast.com/regist
 
 * [ubuntu:latest](https://index.docker.io/_/ubuntu/)
 
-
 ### Installation
 
 1. Install [Docker](https://www.docker.io/).
-
 2. Download [trusted build](https://index.docker.io/u/blacktop/avast/) from public [Docker Registry](https://index.docker.io/): `docker pull blacktop/avast`
 
 #### Alternatively, build an image from Dockerfile
-```bash
-$ docker build -t blacktop/avast .
-```
+`docker build -t blacktop/avast github.com/blacktop/docker-avast`
+
 ### Usage
 ```bash
 $ docker run -i -t blacktop/avast EICAR
@@ -27,7 +24,7 @@ $ docker run -i -t blacktop/avast EICAR
 
 ```
 ### Todo
-- [x] Install/Run avast
+- [x] Install/Run Avast
 - [ ] Start Daemon and watch folder with supervisord
 - [ ] Have container take a URL as input and download/scan file
 - [ ] Output Scan Results as formated JSON
