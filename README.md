@@ -16,7 +16,7 @@ This repository contains a **Dockerfile** of [AVG](http://free.avg.com/us-en/hom
 
 #### Alternatively, build an image from Dockerfile
 ```bash
-$ docker build -t blacktop/avg .
+$ docker build -t blacktop/avg github.com/blacktop/docker-avg
 ```
 
 ### Usage
