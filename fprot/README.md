@@ -11,17 +11,18 @@ This repository contains a **Dockerfile** of [F-PROT](http://www.f-prot.com/prod
 ### Installation
 
 1. Install [Docker](https://www.docker.io/).
-
 2. Download [trusted build](https://index.docker.io/u/blacktop/fprot/) from public [Docker Registry](https://index.docker.io/): `docker pull blacktop/fprot`
 
 #### Alternatively, build an image from Dockerfile
-```bash
-$ docker build -t blacktop/fprot .
-```
+`docker build -t blacktop/fprot github.com/blacktop/docker-fprot`
 
 ### Usage
 ```bash
 $ docker run -i -t blacktop/fprot -r EICAR
+```
+#### Or link your own malware folder:
+```
+$ docker run -i -t -v /path/to/malware/:/malware:ro blacktop/fprot -r /malware
 ```
 #### Output:
 ```bash
