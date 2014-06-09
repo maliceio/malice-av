@@ -15,14 +15,17 @@ This repository contains a **Dockerfile** of [Avira](http://www.avira.com/en/ind
 `docker build -t blacktop/avira github.com/blacktop/docker-avira`
 
 ### Usage
-
+```
   $ docker run -i -t blacktop/avira
+```
 
 #### Or link your own malware folder:
-
+```
   $ docker run -i -t -v /path/to/malware/:/malware:ro blacktop/avira
+```
 
 #### Output:
+```
   Avira AntiVir Professional (ondemand scanner)
   Copyright (C) 2010 by Avira GmbH.
   All rights reserved.
@@ -53,6 +56,7 @@ This repository contains a **Dockerfile** of [Avira](http://www.avira.com/en/ind
            moved: 0
        scan time: 00:00:01
   --------------------------
+```
 
 ### Todo
 - [x] Install/Run Avira
