@@ -12,7 +12,7 @@ RUN apt-get update -qq && apt-get install -yq libc6-i386
 ADD /run.sh /run.sh
 RUN chmod 755 /*.sh
 # Add EICAR Test Virus File to malware folder
-RUN mkdir malware && echo "X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*" > /malware/EICAR
+ADD http://www.eicar.org/download/eicar.com.txt /malware/EICAR
 # Get AVG Installer
 ADD http://download.avgfree.com/filedir/inst/avg2013flx-r3118-a6926.i386.deb /avg/
 
