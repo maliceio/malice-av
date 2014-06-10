@@ -7,7 +7,7 @@ RUN apt-get -q update && apt-get install -yq libc6-i386
 ADD /run.sh /run.sh
 RUN chmod 755 /run.sh
 # Add EICAR Test Virus File to malware folder
-RUN mkdir malware && echo "X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*" > /malware/EICAR
+ADD http://www.eicar.org/download/eicar.com.txt /malware/EICAR
 ADD /unattended.inf /unattended.inf
 #ADD /supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 RUN mkdir /home/quarantine/ #&& mkdir -p /var/log/supervisor
