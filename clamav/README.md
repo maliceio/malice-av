@@ -7,7 +7,7 @@ malice-clamav
 [![Image Size](https://img.shields.io/imagelayers/image-size/malice/clamav/latest.svg)](https://imagelayers.io/?images=malice/clamav:latest)
 [![Image Layers](https://img.shields.io/imagelayers/layers/malice/clamav/latest.svg)](https://imagelayers.io/?images=malice/clamav:latest)
 
-This repository contains a **Dockerfile** of [ClamAV](http://www.clamav.net/lang/en/) for [Docker](https://www.docker.io/)'s [trusted build](https://index.docker.io/u/malice/clamav/) published to the public [Docker Registry](https://index.docker.io/).
+This repository contains a **Dockerfile** of [ClamAV](http://www.clamav.net/lang/en/) for [Docker](https://www.docker.io/)'s [trusted build](https://index.docker.io/u/malice/clamav/) published to the public [DockerHub](https://index.docker.io/).
 
 ### Dependencies
 
@@ -17,7 +17,7 @@ This repository contains a **Dockerfile** of [ClamAV](http://www.clamav.net/lang
 ### Installation
 
 1. Install [Docker](https://www.docker.io/).
-2. Download [trusted build](https://hub.docker.com/r/malice/clamav/) from public [Docker HUB](https://hub.docker.com): `docker pull malice/clamav`
+2. Download [trusted build](https://hub.docker.com/r/malice/clamav/) from public [DockerHub](https://hub.docker.com): `docker pull malice/clamav`
 
 ### Usage
 
