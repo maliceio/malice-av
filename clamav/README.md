@@ -1,28 +1,31 @@
-ClamAV Dockerfile
+malice-clamav
 =============
 
-This repository contains a **Dockerfile** of [ClamAV](http://www.clamav.net/lang/en/) for [Docker](https://www.docker.io/)'s [trusted build](https://index.docker.io/u/blacktop/clamav/) published to the public [Docker Registry](https://index.docker.io/).
+[![License](http://img.shields.io/:license-mit-blue.svg)](http://doge.mit-license.org)
+[![Docker Stars](https://img.shields.io/docker/stars/malice/clamav.svg)][hub]
+[![Docker Pulls](https://img.shields.io/docker/pulls/malice/clamav.svg)][hub]
+[![Image Size](https://img.shields.io/imagelayers/image-size/malice/clamav/latest.svg)](https://imagelayers.io/?images=malice/clamav:latest)
+[![Image Layers](https://img.shields.io/imagelayers/layers/malice/clamav/latest.svg)](https://imagelayers.io/?images=malice/clamav:latest)
+
+This repository contains a **Dockerfile** of [ClamAV](http://www.clamav.net/lang/en/) for [Docker](https://www.docker.io/)'s [trusted build](https://index.docker.io/u/malice/clamav/) published to the public [Docker Registry](https://index.docker.io/).
 
 ### Dependencies
 
-* [debian:jessie](https://index.docker.io/_/debian/)
+* [gliderlabs/alpine:3.3](https://index.docker.io/_/gliderlabs/alpine/)
 
 
 ### Installation
 
 1. Install [Docker](https://www.docker.io/).
-2. Download [trusted build](https://index.docker.io/u/blacktop/clamav/) from public [Docker Registry](https://index.docker.io/): `docker pull blacktop/clamav`
-
-#### Alternatively, build an image from Dockerfile
-`docker build -t blacktop/clamav github.com/blacktop/docker-clamav`
+2. Download [trusted build](https://hub.docker.com/r/malice/clamav/) from public [Docker HUB](https://hub.docker.com): `docker pull malice/clamav`
 
 ### Usage
 
-    docker run -i -t blacktop/clamav EICAR
+    docker run -it --rm malice/clamav EICAR
 
 #### Or link your own malware folder:
 ```bash
-$ docker run -i -t -v /path/to/malware/:/malware:ro blacktop/clamav
+$ docker run -it --rm -v /path/to/file/:/malware:ro malice/clamav FILE
 ```
 #### Output:
 ```bash
@@ -38,9 +41,28 @@ Data scanned: 0.00 MB
 Data read: 0.00 MB (ratio 0.00:1)
 Time: 7.009 sec (0 m 7 s)
 ```
-### Todo
-- [x] Install/Run ClamAV
-- [ ] Start Daemon and watch folder with supervisord
-- [ ] Have container take a URL as input and download/scan file
-- [ ] Output Scan Results as formated JSON
-- [ ] Attach a Volume that will hold malware for a host's tmp folder
+
+### To Run on OSX
+ - Install [Homebrew](http://brew.sh)
+
+```bash
+$ brew install caskroom/cask/brew-cask
+$ brew cask install virtualbox
+$ brew install docker
+$ brew install docker-machine
+$ docker-machine create --driver virtualbox malice
+$ eval $(docker-machine env malice)
+```
+
+### Documentation
+
+### Issues
+
+Find a bug? Want more features? Find something missing in the documentation? Let me know! Please don't hesitate to [file an issue](https://github.com/maliceio/malice-av/issues/new) and I'll get right on it.
+
+### Credits
+
+### License
+MIT Copyright (c) 2016 **blacktop**
+
+[hub]: https://hub.docker.com/r/malice/clamav/
