@@ -3,14 +3,16 @@ FROM gliderlabs/alpine:3.3
 MAINTAINER blacktop, https://github.com/blacktop
 
 COPY . /go/src/github.com/maliceio/malice-clamav
-RUN apk-install clamav
+RUN apk-install clamav clamav-scanner freshclam
 RUN apk-install -t build-deps go git mercurial \
-	&& cd /go/src/github.com/maliceio/malice-gobased-plugin \
+	&& cd /go/src/github.com/maliceio/malice-clamav \
 	&& export GOPATH=/go \
 	&& go get \
-	&& go build -ldflags "-X main.Version $(cat VERSION)" -o /bin/clamscan \
+	&& go build -ldflags "-X main.Version=$(cat VERSION)" -o /bin/clamscan \
 	&& rm -rf /go \
 	&& apk del --purge build-deps
+
+RUN mv /etc/clamav/freshclam.conf.sample /etc/clamav/freshclam.conf && freshclam
 
 ENTRYPOINT ["/bin/clamscan"]
 

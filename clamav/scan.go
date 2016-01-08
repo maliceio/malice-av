@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -11,8 +10,8 @@ import (
 
 var Version string
 
-// FileInfo json object
-type FileInfo struct {
+// ClamAV json object
+type ClamAV struct {
 	SSDeep   string            `json:"ssdeep"`
 	TRiD     []string          `json:"trid"`
 	Exiftool map[string]string `json:"exiftool"`
@@ -50,45 +49,8 @@ func RunCommand(cmd string, path string) string {
 	return string(cmdOut)
 }
 
-// ParseExiftoolOutput convert exiftool output into JSON
-func ParseExiftoolOutput(exifout string) map[string]string {
-
-	var ignoreTags = []string{
-		"Directory",
-		"File Name",
-		"File Permissions",
-		"File Modification Date/Time",
-	}
-
-	lines := strings.Split(exifout, "\n")
-	datas := make(map[string]string, len(lines))
-
-	for _, line := range lines {
-		keyvalue := strings.Split(line, ":")
-		if len(keyvalue) != 2 {
-			continue
-		}
-		if !stringInSlice(strings.TrimSpace(keyvalue[0]), ignoreTags) {
-			datas[strings.TrimSpace(keyvalue[0])] = strings.TrimSpace(keyvalue[1])
-		}
-	}
-
-	return datas
-}
-
-// ParseSsdeepOutput convert ssdeep output into JSON
-func ParseSsdeepOutput(ssdout string) string {
-
-	// Break output into lines
-	lines := strings.Split(ssdout, "\n")
-	// Break second line into hash and path
-	hashAndPath := strings.Split(lines[1], ",")
-
-	return strings.TrimSpace(hashAndPath[0])
-}
-
-// ParseTRiDOutput convert trid output into JSON
-func ParseTRiDOutput(tridout string) []string {
+// ParseClamAvOutput convert clamav output into JSON
+func ParseClamAvOutput(tridout string) []string {
 
 	keepLines := []string{}
 
@@ -122,14 +84,16 @@ func main() {
 		assert(err)
 	}
 
-	fileInfo := FileInfo{
-		SSDeep:   ParseSsdeepOutput(RunCommand("ssdeep", path)),
-		TRiD:     ParseTRiDOutput(RunCommand("trid", path)),
-		Exiftool: ParseExiftoolOutput(RunCommand("exiftool", path)),
-	}
+	clamOutput := RunCommand("clamscan", path)
+	fmt.Println(clamOutput)
+	// fileInfo := FileInfo{
+	// 	SSDeep:   ParseSsdeepOutput(RunCommand("ssdeep", path)),
+	// 	TRiD:     ParseTRiDOutput(RunCommand("trid", path)),
+	// 	Exiftool: ParseExiftoolOutput(RunCommand("exiftool", path)),
+	// }
 
-	fileInfoJSON, err := json.Marshal(fileInfo)
-	assert(err)
-
-	fmt.Println(string(fileInfoJSON))
+	// fileInfoJSON, err := json.Marshal(fileInfo)
+	// assert(err)
+	//
+	// fmt.Println(string(fileInfoJSON))
 }
