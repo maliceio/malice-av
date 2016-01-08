@@ -2,17 +2,17 @@ FROM gliderlabs/alpine:3.3
 
 MAINTAINER blacktop, https://github.com/blacktop
 
-COPY . /go/src/github.com/maliceio/malice-gobased-plugin
+COPY . /go/src/github.com/maliceio/malice-clamav
 RUN apk-install clamav
 RUN apk-install -t build-deps go git mercurial \
 	&& cd /go/src/github.com/maliceio/malice-gobased-plugin \
 	&& export GOPATH=/go \
 	&& go get \
-	&& go build -ldflags "-X main.Version $(cat VERSION)" -o /bin/malice-gobased-plugin \
+	&& go build -ldflags "-X main.Version $(cat VERSION)" -o /bin/clamscan \
 	&& rm -rf /go \
 	&& apk del --purge build-deps
 
-ENTRYPOINT ["/bin/malice-gobased-plugin"]
+ENTRYPOINT ["/bin/clamscan"]
 
 
 
