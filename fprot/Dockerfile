@@ -1,6 +1,7 @@
-FROM debian:wheezy
+FROM debian:jessie
 MAINTAINER blacktop, https://github.com/blacktop
 
+COPY . /go/src/github.com/maliceio/malice-fprot
 RUN buildDeps='ca-certificates \
                build-essential \
                golang-go \
@@ -9,13 +10,11 @@ RUN buildDeps='ca-certificates \
                unzip \
                curl' \
   && set -x \
-  && echo 'deb http://ftp.us.debian.org/debian/ testing main contrib non-free' >> /etc/apt/sources.list \
   && apt-get update -qq \
-  && apt-get install -t testing libc6 \
-  && apt-get install -yq $buildDeps libimage-exiftool-perl --no-install-recommends \
+  && apt-get install -yq $buildDeps libimage-exiftool-perl libc6-i386 --no-install-recommends \
   && set -x \
   && echo "Install F-PROT..." \
-  && curl -Ls http://files.f-prot.com/files/unix-trial/fp-Linux.x86.32-ws.tar.gz > /tmp/fprot.tar.gz \
+  && curl -Ls http://files.f-prot.com/files/unix-trial/fp-Linux.x86.64-ws.tar.gz > /tmp/fprot.tar.gz \
   && cd /tmp \
   && tar -C /opt -zxvf fprot.tar.gz \
   && ln -fs /opt/f-prot/fpscan /usr/local/bin/fpscan \
@@ -26,10 +25,8 @@ RUN buildDeps='ca-certificates \
   && chmod a+x /opt/f-prot/fpscan \
   && chmod u+x /opt/f-prot/fpupdate \
   && ln -fs /opt/f-prot/man_pages/scan-mail.pl.8 /usr/share/man/man8/ \
-  && echo "Updating F-PROT Definitions..." \
-  && /opt/f-prot/fpupdate \
   && echo "Building info Go binary..." \
-  && cd /go/src/github.com/maliceio/malice-fileinfo \
+  && cd /go/src/github.com/maliceio/malice-fprot \
   && export GOPATH=/go \
   && go get \
   && go build -ldflags "-X main.Version $(cat VERSION)" -o /bin/info \
@@ -37,6 +34,13 @@ RUN buildDeps='ca-certificates \
   && apt-get purge -y --auto-remove $buildDeps \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /go
+
+# http://files.f-prot.com/files/unix-trial/fp-Linux.x86.64-fs.tar.gz
+# http://files.f-prot.com/files/unix-trial/fp-Linux.x86.32-ws.tar.gz
+# http://files.f-prot.com/files/unix-trial/fp-Linux.x86.64-ws.tar.gz
+
+# Update F-PROT Definitions
+RUN /opt/f-prot/fpupdate
 
 # Add EICAR Test Virus File to malware folder
 ADD http://www.eicar.org/download/eicar.com.txt /malware/EICAR

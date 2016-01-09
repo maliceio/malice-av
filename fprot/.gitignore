@@ -22,3 +22,5 @@ _testmain.go
 *.exe
 *.test
 *.prof
+
+fp-Linux.x86.64-fs.tar.gz
