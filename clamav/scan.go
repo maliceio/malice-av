@@ -9,7 +9,10 @@ import (
 	"strings"
 )
 
+// Version stores the plugin's version
 var Version string
+
+// BuildTime stores the plugin's build time
 var BuildTime string
 
 // ClamAV json object
@@ -33,15 +36,6 @@ func assert(err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-func stringInSlice(a string, list []string) bool {
-	for _, b := range list {
-		if b == a {
-			return true
-		}
-	}
-	return false
 }
 
 // RunCommand runs cmd on file
