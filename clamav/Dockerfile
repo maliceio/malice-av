@@ -8,7 +8,7 @@ RUN apk-install -t build-deps go git mercurial \
 	&& cd /go/src/github.com/maliceio/malice-clamav \
 	&& export GOPATH=/go \
 	&& go get \
-	&& go build -ldflags "-X main.Version=$(cat VERSION)" -o /bin/clamscan \
+	&& go build -ldflags "-X main.Version=$(cat VERSION)" -o /bin/scan \
 	&& rm -rf /go \
 	&& apk del --purge build-deps
 
