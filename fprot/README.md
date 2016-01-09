@@ -25,18 +25,27 @@ This repository contains a **Dockerfile** of [fprot](http://www.fprot.net/lang/e
 ```bash
 $ docker run -it --rm -v /path/to/file/:/malware:ro malice/fprot FILE
 ```
-#### Output:
+#### Output JSON:
+```json
+{
+  "infected": true,
+  "result": "EICAR_Test_File (exact)",
+  "engine": "4.6.5.141",
+  "updated": "201601070641"
+}
+```
+#### Output STDOUT:
 ```bash
-F-PROT Antivirus CLS version 6.7.10.6267, 32bit (built: 2012-03-27T12-34-14)
+F-PROT Antivirus CLS version 6.7.10.6267, 64bit (built: 2012-03-27T11-39-07)
 
 
 FRISK Software International (C) Copyright 1989-2011
 Engine version:   4.6.5.141
 Arguments:        -r EICAR
-Virus signatures: 201404190947
+Virus signatures: 201601070641
                   (/opt/f-prot/antivir.def)
 
-[Found virus] '<EICAR_Test_File (exact)> 	EICAR'
+[Found virus] <EICAR_Test_File (exact)> 	EICAR
 Scanning: /
 
 Results:
@@ -50,7 +59,7 @@ Infected files: 1
 Files with errors: 0
 Disinfected: 0
 
-Running time: 00:01
+Running time: 00:00
 ```
 
 ### To Run on OSX

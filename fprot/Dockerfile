@@ -43,8 +43,8 @@ ADD http://www.eicar.org/download/eicar.com.txt /malware/EICAR
 
 WORKDIR /malware
 
-ENTRYPOINT ["/usr/local/bin/fpscan"]
-# ENTRYPOINT ["/bin/scan"]
+# ENTRYPOINT ["/usr/local/bin/fpscan"]
+ENTRYPOINT ["/bin/scan"]
 
 CMD ["--help"]
 
