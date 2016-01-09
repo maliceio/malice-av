@@ -1,28 +1,30 @@
-F-PROT Dockerfile
+malice-fprot
 =============
 
-This repository contains a **Dockerfile** of [F-PROT](http://www.f-prot.com/products/home_use/linux/) for [Docker](https://www.docker.io/)'s [trusted build](https://index.docker.io/u/blacktop/fprot/) published to the public [Docker Registry](https://index.docker.io/).
+[![License](http://img.shields.io/:license-mit-blue.svg)](http://doge.mit-license.org)
+[![Docker Stars](https://img.shields.io/docker/stars/malice/fprot.svg)][hub]
+[![Docker Pulls](https://img.shields.io/docker/pulls/malice/fprot.svg)][hub]
+[![Image Size](https://img.shields.io/imagelayers/image-size/malice/fprot/latest.svg)](https://imagelayers.io/?images=malice/fprot:latest)
+[![Image Layers](https://img.shields.io/imagelayers/layers/malice/fprot/latest.svg)](https://imagelayers.io/?images=malice/fprot:latest)
+
+This repository contains a **Dockerfile** of [fprot](http://www.fprot.net/lang/en/) for [Docker](https://www.docker.io/)'s [trusted build](https://index.docker.io/u/malice/fprot/) published to the public [DockerHub](https://index.docker.io/).
 
 ### Dependencies
 
-* [debian:jessie](https://index.docker.io/_/debian/)
-
+* [debian:wheezy (*85 MB*)](https://index.docker.io/_/debian/)
 
 ### Installation
 
 1. Install [Docker](https://www.docker.io/).
-2. Download [trusted build](https://index.docker.io/u/blacktop/fprot/) from public [Docker Registry](https://index.docker.io/): `docker pull blacktop/fprot`
-
-#### Alternatively, build an image from Dockerfile
-`docker build -t blacktop/fprot github.com/blacktop/docker-fprot`
+2. Download [trusted build](https://hub.docker.com/r/malice/fprot/) from public [DockerHub](https://hub.docker.com): `docker pull malice/fprot`
 
 ### Usage
-```bash
-$ docker run -i -t blacktop/fprot -r EICAR
-```
+
+    docker run -it --rm malice/fprot EICAR
+
 #### Or link your own malware folder:
-```
-$ docker run -i -t -v /path/to/malware/:/malware:ro blacktop/fprot -r /malware
+```bash
+$ docker run -it --rm -v /path/to/file/:/malware:ro malice/fprot FILE
 ```
 #### Output:
 ```bash
@@ -51,9 +53,28 @@ Disinfected: 0
 
 Running time: 00:01
 ```
-### Todo
-- [x] Install/Run F-PROT
-- [ ] Start Daemon and watch folder with supervisord
-- [ ] Have container take a URL as input and download/scan file
-- [ ] Output Scan Results as formated JSON
-- [ ] Attach a Volume that will hold malware for a host's tmp folder
+
+### To Run on OSX
+ - Install [Homebrew](http://brew.sh)
+
+```bash
+$ brew install caskroom/cask/brew-cask
+$ brew cask install virtualbox
+$ brew install docker
+$ brew install docker-machine
+$ docker-machine create --driver virtualbox malice
+$ eval $(docker-machine env malice)
+```
+
+### Documentation
+
+### Issues
+
+Find a bug? Want more features? Find something missing in the documentation? Let me know! Please don't hesitate to [file an issue](https://github.com/maliceio/malice-av/issues/new) and I'll get right on it.
+
+### Credits
+
+### License
+MIT Copyright (c) 2016 **blacktop**
+
+[hub]: https://hub.docker.com/r/malice/fprot/
