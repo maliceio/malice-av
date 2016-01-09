@@ -10,7 +10,7 @@ This repository contains a **Dockerfile** of [fprot](http://www.fprot.net/lang/e
 
 ### Dependencies
 
-* [debian:wheezy (*85 MB*)](https://index.docker.io/_/debian/)
+* [debian:jessie (*125 MB*)](https://index.docker.io/_/debian/)
 
 ### Installation
 
