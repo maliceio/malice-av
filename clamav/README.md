@@ -27,7 +27,19 @@ This repository contains a **Dockerfile** of [ClamAV](http://www.clamav.net/lang
 ```bash
 $ docker run -it --rm -v /path/to/file/:/malware:ro malice/clamav FILE
 ```
-#### Output:
+
+#### Output JSON:
+```json
+{
+  "infected": true,
+  "result": "Eicar-Test-Signature",
+  "engine": " 0.99",
+  "known": " 4211363",
+  "updated": "20160109"
+}
+```
+
+#### Output STDOUT:
 ```bash
 EICAR: 'Eicar-Test-Signature FOUND'
 
