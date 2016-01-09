@@ -95,11 +95,8 @@ func main() {
 		os.Exit(2)
 	}
 	if len(os.Args) == 2 && os.Args[1] == "--version" {
-		fmt.Println(Version)
-		os.Exit(0)
-	}
-	if len(os.Args) == 2 && os.Args[1] == "--build" {
-		fmt.Println(BuildTime)
+		fmt.Println("Version: ", Version)
+		fmt.Println("BuildTime: ", BuildTime)
 		os.Exit(0)
 	}
 
