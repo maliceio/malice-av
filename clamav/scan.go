@@ -21,7 +21,7 @@ type ClamAV struct {
 	Result   string `json:"result"`
 	Engine   string `json:"engine"`
 	Known    string `json:"known"`
-	Update   string `json:"update"`
+	Updated  string `json:"updated"`
 }
 
 func getopt(name, dfault string) string {
@@ -39,10 +39,12 @@ func assert(err error) {
 }
 
 // RunCommand runs cmd on file
-func RunCommand(cmd string, path string) string {
+func RunCommand(cmd string, args ...string) string {
 
-	cmdOut, err := exec.Command(cmd, path).Output()
-	assert(err)
+	cmdOut, err := exec.Command(cmd, args...).Output()
+	if len(cmdOut) == 0 {
+		assert(err)
+	}
 
 	return string(cmdOut)
 }
@@ -53,7 +55,6 @@ func ParseClamAvOutput(clamout string) ClamAV {
 	clamAV := ClamAV{}
 
 	lines := strings.Split(clamout, "\n")
-	// fmt.Println(lines)
 	// Extract AV Scan Result
 	result := lines[0]
 	if len(result) != 0 {
@@ -83,7 +84,7 @@ func ParseClamAvOutput(clamout string) ClamAV {
 		}
 	}
 
-	clamAV.Update = BuildTime
+	clamAV.Updated = BuildTime
 
 	return clamAV
 }
@@ -106,7 +107,7 @@ func main() {
 		assert(err)
 	}
 
-	clamOutput := RunCommand("/usr/bin/clamscan --stdout", path)
+	clamOutput := RunCommand("/usr/bin/clamscan", "--stdout", path)
 	// fmt.Println(ParseClamAvOutput(clamOutput))
 
 	clamavJSON, err := json.Marshal(ParseClamAvOutput(clamOutput))
