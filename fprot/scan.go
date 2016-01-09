@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"regexp"
 	"strings"
 )
 
@@ -15,13 +16,12 @@ var Version string
 // BuildTime stores the plugin's build time
 var BuildTime string
 
-// ClamAV json object
-type ClamAV struct {
+// FPROT json object
+type FPROT struct {
 	Infected bool   `json:"infected"`
 	Result   string `json:"result"`
 	Engine   string `json:"engine"`
-	Known    string `json:"known"`
-	Update   string `json:"update"`
+	Updated  string `json:"updated"`
 }
 
 func getopt(name, dfault string) string {
@@ -39,53 +39,74 @@ func assert(err error) {
 }
 
 // RunCommand runs cmd on file
-func RunCommand(cmd string, path string) string {
+func RunCommand(cmd string, args ...string) string {
 
-	cmdOut, err := exec.Command(cmd, path).Output()
-	assert(err)
+	cmdOut, err := exec.Command(cmd, args...).Output()
+	if len(cmdOut) == 0 {
+		assert(err)
+	}
 
 	return string(cmdOut)
 }
 
-// ParseClamAvOutput convert clamav output into ClamAV struct
-func ParseClamAvOutput(clamout string) ClamAV {
+// ParseFprotOutput convert fprot output into FPROT struct
+func ParseFprotOutput(fprotout string) FPROT {
 
-	clamAV := ClamAV{}
+	fprot := FPROT{Infected: false}
+	colonSeparated := []string{}
 
-	lines := strings.Split(clamout, "\n")
-	// fmt.Println(lines)
-	// Extract AV Scan Result
-	result := lines[0]
-	if len(result) != 0 {
-		pathAndResult := strings.Split(result, ":")
-		if strings.Contains(pathAndResult[1], "OK") {
-			clamAV.Infected = false
-		} else {
-			clamAV.Infected = true
-			clamAV.Result = strings.TrimSpace(strings.TrimRight(pathAndResult[1], "FOUND"))
-		}
-	} else {
-		fmt.Println("[ERROR] empty scan result: ", result)
-		os.Exit(2)
-	}
-	// Extract Clam Details from SCAN SUMMARY
-	for _, line := range lines[1:] {
+	lines := strings.Split(fprotout, "\n")
+	// Extract Virus string and extract colon separated lines into an slice
+	for _, line := range lines {
 		if len(line) != 0 {
-			keyvalue := strings.Split(line, ":")
-			if len(keyvalue) != 0 {
-				switch {
-				case strings.Contains(keyvalue[0], "Known viruses"):
-					clamAV.Known = keyvalue[1]
-				case strings.Contains(line, "Engine version"):
-					clamAV.Engine = keyvalue[1]
+			if strings.Contains(line, ":") {
+				colonSeparated = append(colonSeparated, line)
+			}
+			if strings.Contains(line, "[Found virus]") {
+				result := extractVirusName(line)
+				if len(result) != 0 {
+					fprot.Result = result
+					fprot.Infected = true
+				} else {
+					fmt.Println("[ERROR] colonSeparated was empty: ", colonSeparated)
+					os.Exit(2)
 				}
 			}
 		}
 	}
+	// fmt.Println(lines)
 
-	clamAV.Update = BuildTime
+	// Extract FPROT Details from scan output
+	if len(colonSeparated) != 0 {
+		for _, line := range colonSeparated {
+			if len(line) != 0 {
+				keyvalue := strings.Split(line, ":")
+				if len(keyvalue) != 0 {
+					switch {
+					case strings.Contains(keyvalue[0], "Virus signatures"):
+						fprot.Updated = strings.TrimSpace(keyvalue[1])
+					case strings.Contains(line, "Engine version"):
+						fprot.Engine = strings.TrimSpace(keyvalue[1])
+					}
+				}
+			}
+		}
+	} else {
+		fmt.Println("[ERROR] colonSeparated was empty: ", colonSeparated)
+		os.Exit(2)
+	}
 
-	return clamAV
+	return fprot
+}
+
+// extractVirusName extracts Virus name from scan results string
+func extractVirusName(line string) string {
+	r := regexp.MustCompile(`<(.+)>`)
+	res := r.FindStringSubmatch(line)
+	if len(res) != 2 {
+		return ""
+	}
+	return res[1]
 }
 
 func main() {
@@ -106,11 +127,11 @@ func main() {
 		assert(err)
 	}
 
-	clamOutput := RunCommand("/usr/local/bin/fpscan -r", path)
-	// fmt.Println(ParseClamAvOutput(clamOutput))
+	fprotOutput := RunCommand("/usr/local/bin/fpscan", "-r", path)
+	// fmt.Println(ParseFprotOutput(clamOutput))
 
-	clamavJSON, err := json.Marshal(ParseClamAvOutput(clamOutput))
+	fprotJSON, err := json.Marshal(ParseFprotOutput(fprotOutput))
 	assert(err)
 
-	fmt.Println(string(clamavJSON))
+	fmt.Println(string(fprotJSON))
 }

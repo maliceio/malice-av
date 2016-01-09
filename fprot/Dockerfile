@@ -11,7 +11,7 @@ RUN buildDeps='ca-certificates \
                curl' \
   && set -x \
   && apt-get update -qq \
-  && apt-get install -yq $buildDeps libimage-exiftool-perl libc6-i386 --no-install-recommends \
+  && apt-get install -yq $buildDeps libc6-i386 --no-install-recommends \
   && set -x \
   && echo "Install F-PROT..." \
   && curl -Ls http://files.f-prot.com/files/unix-trial/fp-Linux.x86.64-ws.tar.gz > /tmp/fprot.tar.gz \
@@ -35,10 +35,6 @@ RUN buildDeps='ca-certificates \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /go
 
-# http://files.f-prot.com/files/unix-trial/fp-Linux.x86.64-fs.tar.gz
-# http://files.f-prot.com/files/unix-trial/fp-Linux.x86.32-ws.tar.gz
-# http://files.f-prot.com/files/unix-trial/fp-Linux.x86.64-ws.tar.gz
-
 # Update F-PROT Definitions
 RUN /opt/f-prot/fpupdate
 
@@ -51,3 +47,7 @@ ENTRYPOINT ["/usr/local/bin/fpscan"]
 # ENTRYPOINT ["/bin/scan"]
 
 CMD ["--help"]
+
+# http://files.f-prot.com/files/unix-trial/fp-Linux.x86.64-fs.tar.gz
+# http://files.f-prot.com/files/unix-trial/fp-Linux.x86.32-ws.tar.gz
+# http://files.f-prot.com/files/unix-trial/fp-Linux.x86.64-ws.tar.gz
