@@ -3,7 +3,7 @@ FROM gliderlabs/alpine:3.3
 MAINTAINER blacktop, https://github.com/blacktop
 
 COPY . /go/src/github.com/maliceio/malice-clamav
-RUN apk-install clamav clamav-dev
+RUN apk-install clamav freshclam
 RUN apk-install -t build-deps go git mercurial \
   && set -x \
 	&& echo "Updating ClamAV Definitions..." \
@@ -14,7 +14,7 @@ RUN apk-install -t build-deps go git mercurial \
 	&& cd /go/src/github.com/maliceio/malice-clamav \
 	&& export GOPATH=/go \
 	&& go get \
-	&& go build -ldflags "-X main.Version=$(cat VERSION)" -o /bin/scan \
+	&& go build -ldflags "-X main.Version=$(cat VERSION) -X main.BuildTime=$(date -u +%Y%m%d)" -o /bin/scan \
 	&& rm -rf /go \
 	&& apk del --purge build-deps
 

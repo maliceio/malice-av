@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -9,12 +10,15 @@ import (
 )
 
 var Version string
+var BuildTime string
 
 // ClamAV json object
 type ClamAV struct {
-	SSDeep   string            `json:"ssdeep"`
-	TRiD     []string          `json:"trid"`
-	Exiftool map[string]string `json:"exiftool"`
+	Infected bool   `json:"infected"`
+	Result   string `json:"result"`
+	Engine   string `json:"engine"`
+	Known    string `json:"known"`
+	Update   string `json:"update"`
 }
 
 func getopt(name, dfault string) string {
@@ -49,22 +53,45 @@ func RunCommand(cmd string, path string) string {
 	return string(cmdOut)
 }
 
-// ParseClamAvOutput convert clamav output into JSON
-func ParseClamAvOutput(tridout string) []string {
+// ParseClamAvOutput convert clamav output into ClamAV struct
+func ParseClamAvOutput(clamout string) ClamAV {
 
-	keepLines := []string{}
+	clamAV := ClamAV{}
 
-	lines := strings.Split(tridout, "\n")
-	// lines = lines[6:]
+	lines := strings.Split(clamout, "\n")
 	// fmt.Println(lines)
-
-	for _, line := range lines {
+	// Extract AV Scan Result
+	result := lines[0]
+	if len(result) != 0 {
+		pathAndResult := strings.Split(result, ":")
+		if strings.Contains(pathAndResult[1], "OK") {
+			clamAV.Infected = false
+		} else {
+			clamAV.Infected = true
+			clamAV.Result = pathAndResult[1]
+		}
+	} else {
+		fmt.Println("[ERROR] empty scan result: ", result)
+		os.Exit(2)
+	}
+	// Extract Clam Details from SCAN SUMMARY
+	for _, line := range lines[1:] {
 		if len(line) != 0 {
-			keepLines = append(keepLines, strings.TrimSpace(line))
+			keyvalue := strings.Split(line, ":")
+			if len(keyvalue) != 0 {
+				switch {
+				case strings.Contains(keyvalue[0], "Known viruses"):
+					clamAV.Known = keyvalue[1]
+				case strings.Contains(line, "Engine version"):
+					clamAV.Engine = keyvalue[1]
+				}
+			}
 		}
 	}
 
-	return keepLines
+	clamAV.Update = BuildTime
+
+	return clamAV
 }
 
 func main() {
@@ -77,6 +104,10 @@ func main() {
 		fmt.Println(Version)
 		os.Exit(0)
 	}
+	if len(os.Args) == 2 && os.Args[1] == "--build" {
+		fmt.Println(BuildTime)
+		os.Exit(0)
+	}
 
 	path := os.Args[1]
 
@@ -85,15 +116,10 @@ func main() {
 	}
 
 	clamOutput := RunCommand("/usr/bin/clamscan", path)
-	fmt.Println(clamOutput)
-	// fileInfo := FileInfo{
-	// 	SSDeep:   ParseSsdeepOutput(RunCommand("ssdeep", path)),
-	// 	TRiD:     ParseTRiDOutput(RunCommand("trid", path)),
-	// 	Exiftool: ParseExiftoolOutput(RunCommand("exiftool", path)),
-	// }
+	// fmt.Println(ParseClamAvOutput(clamOutput))
 
-	// fileInfoJSON, err := json.Marshal(fileInfo)
-	// assert(err)
-	//
-	// fmt.Println(string(fileInfoJSON))
+	clamavJSON, err := json.Marshal(ParseClamAvOutput(clamOutput))
+	assert(err)
+
+	fmt.Println(string(clamavJSON))
 }
