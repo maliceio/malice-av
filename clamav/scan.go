@@ -55,7 +55,7 @@ func ParseClamAvOutput(tridout string) []string {
 	keepLines := []string{}
 
 	lines := strings.Split(tridout, "\n")
-	lines = lines[6:]
+	// lines = lines[6:]
 	// fmt.Println(lines)
 
 	for _, line := range lines {
@@ -84,7 +84,7 @@ func main() {
 		assert(err)
 	}
 
-	clamOutput := RunCommand("clamscan", path)
+	clamOutput := RunCommand("/usr/bin/clamscan", path)
 	fmt.Println(clamOutput)
 	// fileInfo := FileInfo{
 	// 	SSDeep:   ParseSsdeepOutput(RunCommand("ssdeep", path)),

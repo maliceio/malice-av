@@ -20,4 +20,4 @@ ADD http://www.eicar.org/download/eicar.com.txt /malware/EICAR
 
 WORKDIR /malware
 
-ENTRYPOINT ["/bin/clamscan"]
+ENTRYPOINT ["/bin/scan"]
