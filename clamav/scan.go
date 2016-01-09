@@ -62,7 +62,7 @@ func ParseClamAvOutput(clamout string) ClamAV {
 			clamAV.Infected = false
 		} else {
 			clamAV.Infected = true
-			clamAV.Result = pathAndResult[1]
+			clamAV.Result = strings.TrimSpace(strings.TrimRight(pathAndResult[1], "FOUND"))
 		}
 	} else {
 		fmt.Println("[ERROR] empty scan result: ", result)
@@ -106,7 +106,7 @@ func main() {
 		assert(err)
 	}
 
-	clamOutput := RunCommand("/usr/bin/clamscan", path)
+	clamOutput := RunCommand("/usr/bin/clamscan --stdout", path)
 	// fmt.Println(ParseClamAvOutput(clamOutput))
 
 	clamavJSON, err := json.Marshal(ParseClamAvOutput(clamOutput))
