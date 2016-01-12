@@ -17,6 +17,11 @@ var BuildTime string
 
 // ClamAV json object
 type ClamAV struct {
+	Results ResultsData `json:"clamav"`
+}
+
+// ResultsData json object
+type ResultsData struct {
 	Infected bool   `json:"infected"`
 	Result   string `json:"result"`
 	Engine   string `json:"engine"`
@@ -50,9 +55,9 @@ func RunCommand(cmd string, args ...string) string {
 }
 
 // ParseClamAvOutput convert clamav output into ClamAV struct
-func ParseClamAvOutput(clamout string) ClamAV {
+func ParseClamAvOutput(clamout string) ResultsData {
 
-	clamAV := ClamAV{}
+	clamAV := ResultsData{}
 
 	lines := strings.Split(clamout, "\n")
 	// Extract AV Scan Result
@@ -76,9 +81,9 @@ func ParseClamAvOutput(clamout string) ClamAV {
 			if len(keyvalue) != 0 {
 				switch {
 				case strings.Contains(keyvalue[0], "Known viruses"):
-					clamAV.Known = keyvalue[1]
+					clamAV.Known = strings.TrimSpace(keyvalue[1])
 				case strings.Contains(line, "Engine version"):
-					clamAV.Engine = keyvalue[1]
+					clamAV.Engine = strings.TrimSpace(keyvalue[1])
 				}
 			}
 		}
@@ -110,7 +115,9 @@ func main() {
 	clamOutput := RunCommand("/usr/bin/clamscan", "--stdout", path)
 	// fmt.Println(ParseClamAvOutput(clamOutput))
 
-	clamavJSON, err := json.Marshal(ParseClamAvOutput(clamOutput))
+	clamavJSON, err := json.Marshal(ClamAV{
+		Results: ParseClamAvOutput(clamOutput),
+	})
 	assert(err)
 
 	fmt.Println(string(clamavJSON))
