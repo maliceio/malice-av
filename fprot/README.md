@@ -28,10 +28,12 @@ $ docker run -it --rm -v /path/to/file/:/malware:ro malice/fprot FILE
 #### Output JSON:
 ```json
 {
-  "infected": true,
-  "result": "EICAR_Test_File (exact)",
-  "engine": "4.6.5.141",
-  "updated": "201601070641"
+  "f-prot": {
+    "infected": true,
+    "result": "EICAR_Test_File (exact)",
+    "engine": "4.6.5.141",
+    "updated": "201601110435"
+  }
 }
 ```
 #### Output STDOUT:

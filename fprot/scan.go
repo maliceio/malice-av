@@ -18,6 +18,11 @@ var BuildTime string
 
 // FPROT json object
 type FPROT struct {
+	Results ResultsData `json:"f-prot"`
+}
+
+// ResultsData json object
+type ResultsData struct {
 	Infected bool   `json:"infected"`
 	Result   string `json:"result"`
 	Engine   string `json:"engine"`
@@ -49,10 +54,10 @@ func RunCommand(cmd string, args ...string) string {
 	return string(cmdOut)
 }
 
-// ParseFprotOutput convert fprot output into FPROT struct
-func ParseFprotOutput(fprotout string) FPROT {
+// ParseFprotOutput convert fprot output into ResultsData struct
+func ParseFprotOutput(fprotout string) ResultsData {
 
-	fprot := FPROT{Infected: false}
+	fprot := ResultsData{Infected: false}
 	colonSeparated := []string{}
 
 	lines := strings.Split(fprotout, "\n")
@@ -128,9 +133,11 @@ func main() {
 	}
 
 	fprotOutput := RunCommand("/usr/local/bin/fpscan", "-r", path)
-	// fmt.Println(ParseFprotOutput(clamOutput))
+	// fmt.Println(ParseFprotOutput(fprotOutput))
 
-	fprotJSON, err := json.Marshal(ParseFprotOutput(fprotOutput))
+	fprotJSON, err := json.Marshal(FPROT{
+		Results: ParseFprotOutput(fprotOutput),
+	})
 	assert(err)
 
 	fmt.Println(string(fprotJSON))
