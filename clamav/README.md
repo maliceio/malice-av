@@ -30,11 +30,13 @@ $ docker run -it --rm -v /path/to/file/:/malware:ro malice/clamav FILE
 #### Output JSON:
 ```json
 {
-  "infected": true,
-  "result": "Eicar-Test-Signature",
-  "engine": " 0.99",
-  "known": " 4211363",
-  "updated": "20160109"
+  "clamav": {
+    "infected": true,
+    "result": "Eicar-Test-Signature",
+    "engine": "0.99",
+    "known": "4213581",
+    "updated": "20160112"
+  }
 }
 ```
 
