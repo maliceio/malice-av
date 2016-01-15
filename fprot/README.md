@@ -24,8 +24,32 @@ This repository contains a **Dockerfile** of [fprot](http://www.fprot.net/lang/e
 #### Or link your own malware folder:
 ```bash
 $ docker run -it --rm -v /path/to/file/:/malware:ro malice/fprot FILE
+
+Usage: fprot [OPTIONS] COMMAND [arg...]
+
+Malice F-PROT AntiVirus Plugin
+
+Version: v0.1.0, BuildTime: 20160114
+
+Author:
+  blacktop - <https://github.com/blacktop>
+
+Options:
+  --table, -t	output as Markdown table
+  --post, -p	POST results to Malice webhook [$MALICE_ENDPOINT]
+  --proxy, -x	proxy settings for Malice webhook endpoint [$MALICE_PROXY]
+  --help, -h	show help
+  --version, -v	print the version
+
+Commands:
+  help	Shows a list of commands or help for one command
+
+Run 'fprot COMMAND --help' for more information on a command.
 ```
-#### Output JSON:
+
+This will output to stdout and POST to malice results API webhook endpoint.
+
+### Sample Output JSON:
 ```json
 {
   "f-prot": {
@@ -36,34 +60,13 @@ $ docker run -it --rm -v /path/to/file/:/malware:ro malice/fprot FILE
   }
 }
 ```
-#### Output STDOUT:
-```bash
-F-PROT Antivirus CLS version 6.7.10.6267, 64bit (built: 2012-03-27T11-39-07)
-
-
-FRISK Software International (C) Copyright 1989-2011
-Engine version:   4.6.5.141
-Arguments:        -r EICAR
-Virus signatures: 201601070641
-                  (/opt/f-prot/antivir.def)
-
-[Found virus] <EICAR_Test_File (exact)> 	EICAR
-Scanning: /
-
-Results:
-
-Files: 1
-Skipped files: 0
-MBR/boot sectors checked: 0
-Objects scanned: 1
-Infected objects: 1
-Infected files: 1
-Files with errors: 0
-Disinfected: 0
-
-Running time: 00:00
-```
-
+### Sample Output STDOUT (Markdown Table):
+---
+#### F-PROT
+| Infected | Result                  | Engine    | Updated      |
+| -------- | ----------------------- | --------- | ------------ |
+| true     | EICAR_Test_File (exact) | 4.6.5.141 | 201601140816 |
+---
 ### To Run on OSX
  - Install [Homebrew](http://brew.sh)
 
