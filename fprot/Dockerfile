@@ -1,4 +1,5 @@
 FROM debian:jessie
+
 MAINTAINER blacktop, https://github.com/blacktop
 
 COPY . /go/src/github.com/maliceio/malice-fprot
