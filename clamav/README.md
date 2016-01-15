@@ -26,9 +26,9 @@ This repository contains a **Dockerfile** of [ClamAV](http://www.clamav.net/lang
 ```bash
 $ docker run -it --rm -v /path/to/file/:/malware:ro malice/clamav
 
-Usage: fprot [OPTIONS] COMMAND [arg...]
+Usage: clamav [OPTIONS] COMMAND [arg...]
 
-Malice F-PROT AntiVirus Plugin
+Malice ClamAV Plugin
 
 Version: v0.1.0, BuildTime: 20160114
 
@@ -45,7 +45,7 @@ Options:
 Commands:
   help	Shows a list of commands or help for one command
 
-Run 'fprot COMMAND --help' for more information on a command.
+Run 'clamav COMMAND --help' for more information on a command.
 ```
 
 This will output to stdout and POST to malice results API webhook endpoint.
@@ -64,39 +64,11 @@ This will output to stdout and POST to malice results API webhook endpoint.
 ```
 ### Sample Output STDOUT (Markdown Table):
 ---
-#### F-PROT
-| Infected | Result                  | Engine    | Updated      |
-| -------- | ----------------------- | --------- | ------------ |
-| true     | EICAR_Test_File (exact) | 4.6.5.141 | 201601140816 |
+#### ClamAV
+| Infected | Result               | Engine | Known   | Updated  |
+| -------- | -------------------- | ------ | ------- | -------- |
+| true     | Eicar-Test-Signature | 0.99   | 4218998 | 20160115 |
 ---
-#### Output JSON:
-```json
-{
-  "clamav": {
-    "infected": true,
-    "result": "Eicar-Test-Signature",
-    "engine": "0.99",
-    "known": "4213581",
-    "updated": "20160112"
-  }
-}
-```
-
-#### Output STDOUT:
-```bash
-EICAR: 'Eicar-Test-Signature FOUND'
-
------------ SCAN SUMMARY -----------
-Known viruses: 3324284
-Engine version: 0.98.1
-Scanned directories: 0
-Scanned files: 1
-Infected files: 1
-Data scanned: 0.00 MB
-Data read: 0.00 MB (ratio 0.00:1)
-Time: 7.009 sec (0 m 7 s)
-```
-
 ### To Run on OSX
  - Install [Homebrew](http://brew.sh)
 

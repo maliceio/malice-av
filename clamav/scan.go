@@ -139,12 +139,12 @@ Run '{{.Name}} COMMAND --help' for more information on a command.
 func main() {
 	cli.AppHelpTemplate = appHelpTemplate
 	app := cli.NewApp()
-	app.Name = "fprot"
+	app.Name = "clamav"
 	app.Author = "blacktop"
 	app.Email = "https://github.com/blacktop"
 	app.Version = Version + ", BuildTime: " + BuildTime
 	app.Compiled, _ = time.Parse("20060102", BuildTime)
-	app.Usage = "Malice F-PROT AntiVirus Plugin"
+	app.Usage = "Malice ClamAV Plugin"
 	app.Flags = []cli.Flag{
 		cli.BoolFlag{
 			Name:  "table, t",
