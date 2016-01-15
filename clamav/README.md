@@ -24,9 +24,51 @@ This repository contains a **Dockerfile** of [ClamAV](http://www.clamav.net/lang
 
 #### Or link your own malware folder:
 ```bash
-$ docker run -it --rm -v /path/to/file/:/malware:ro malice/clamav FILE
+$ docker run -it --rm -v /path/to/file/:/malware:ro malice/clamav
+
+Usage: fprot [OPTIONS] COMMAND [arg...]
+
+Malice F-PROT AntiVirus Plugin
+
+Version: v0.1.0, BuildTime: 20160114
+
+Author:
+  blacktop - <https://github.com/blacktop>
+
+Options:
+  --table, -t	output as Markdown table
+  --post, -p	POST results to Malice webhook [$MALICE_ENDPOINT]
+  --proxy, -x	proxy settings for Malice webhook endpoint [$MALICE_PROXY]
+  --help, -h	show help
+  --version, -v	print the version
+
+Commands:
+  help	Shows a list of commands or help for one command
+
+Run 'fprot COMMAND --help' for more information on a command.
 ```
 
+This will output to stdout and POST to malice results API webhook endpoint.
+
+### Sample Output JSON:
+```json
+{
+  "clamav": {
+    "infected": true,
+    "result": "Eicar-Test-Signature",
+    "engine": "0.99",
+    "known": "4213581",
+    "updated": "20160112"
+  }
+}
+```
+### Sample Output STDOUT (Markdown Table):
+---
+#### F-PROT
+| Infected | Result                  | Engine    | Updated      |
+| -------- | ----------------------- | --------- | ------------ |
+| true     | EICAR_Test_File (exact) | 4.6.5.141 | 201601140816 |
+---
 #### Output JSON:
 ```json
 {

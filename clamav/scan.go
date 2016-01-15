@@ -7,6 +7,11 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"time"
+
+	"github.com/codegangsta/cli"
+	"github.com/crackcomm/go-clitable"
+	"github.com/parnurzeal/gorequest"
 )
 
 // Version stores the plugin's version
@@ -94,31 +99,124 @@ func ParseClamAvOutput(clamout string) ResultsData {
 	return clamAV
 }
 
-func main() {
+func printStatus(resp gorequest.Response, body string, errs []error) {
+	fmt.Println(resp.Status)
+}
 
-	if len(os.Args) < 2 {
-		fmt.Println("[ERROR] Missing input file.")
-		os.Exit(2)
-	}
-	if len(os.Args) == 2 && os.Args[1] == "--version" {
-		fmt.Println("Version: ", Version)
-		fmt.Println("BuildTime: ", BuildTime)
-		os.Exit(0)
-	}
-
-	path := os.Args[1]
-
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		assert(err)
-	}
-
-	clamOutput := RunCommand("/usr/bin/clamscan", "--stdout", path)
-	// fmt.Println(ParseClamAvOutput(clamOutput))
-
-	clamavJSON, err := json.Marshal(ClamAV{
-		Results: ParseClamAvOutput(clamOutput),
+func printMarkDownTable(clamav ClamAV) {
+	fmt.Println("#### ClamAV")
+	table := clitable.New([]string{"Infected", "Result", "Engine", "Known", "Updated"})
+	table.AddRow(map[string]interface{}{
+		"Infected": clamav.Results.Infected,
+		"Result":   clamav.Results.Result,
+		"Engine":   clamav.Results.Engine,
+		"Known":    clamav.Results.Known,
+		"Updated":  clamav.Results.Updated,
 	})
+	table.Markdown = true
+	table.Print()
+}
+
+var appHelpTemplate = `Usage: {{.Name}} {{if .Flags}}[OPTIONS] {{end}}COMMAND [arg...]
+
+{{.Usage}}
+
+Version: {{.Version}}{{if or .Author .Email}}
+
+Author:{{if .Author}}
+  {{.Author}}{{if .Email}} - <{{.Email}}>{{end}}{{else}}
+  {{.Email}}{{end}}{{end}}
+{{if .Flags}}
+Options:
+  {{range .Flags}}{{.}}
+  {{end}}{{end}}
+Commands:
+  {{range .Commands}}{{.Name}}{{with .ShortName}}, {{.}}{{end}}{{ "\t" }}{{.Usage}}
+  {{end}}
+Run '{{.Name}} COMMAND --help' for more information on a command.
+`
+
+func main() {
+	cli.AppHelpTemplate = appHelpTemplate
+	app := cli.NewApp()
+	app.Name = "fprot"
+	app.Author = "blacktop"
+	app.Email = "https://github.com/blacktop"
+	app.Version = Version + ", BuildTime: " + BuildTime
+	app.Compiled, _ = time.Parse("20060102", BuildTime)
+	app.Usage = "Malice F-PROT AntiVirus Plugin"
+	app.Flags = []cli.Flag{
+		cli.BoolFlag{
+			Name:  "table, t",
+			Usage: "output as Markdown table",
+		},
+		cli.BoolFlag{
+			Name:   "post, p",
+			Usage:  "POST results to Malice webhook",
+			EnvVar: "MALICE_ENDPOINT",
+		},
+		cli.BoolFlag{
+			Name:   "proxy, x",
+			Usage:  "proxy settings for Malice webhook endpoint",
+			EnvVar: "MALICE_PROXY",
+		},
+	}
+	app.Action = func(c *cli.Context) {
+		path := c.Args().First()
+
+		if _, err := os.Stat(path); os.IsNotExist(err) {
+			assert(err)
+		}
+
+		clamav := ClamAV{
+			Results: ParseClamAvOutput(RunCommand("/usr/bin/clamscan", "--stdout", path)),
+		}
+
+		if c.Bool("table") {
+			printMarkDownTable(clamav)
+		} else {
+			fprotJSON, err := json.Marshal(clamav)
+			assert(err)
+			if c.Bool("post") {
+				request := gorequest.New()
+				if c.Bool("proxy") {
+					request = gorequest.New().Proxy(os.Getenv("MALICE_PROXY"))
+				}
+				request.Post(os.Getenv("MALICE_ENDPOINT")).
+					Set("Task", path).
+					Send(fprotJSON).
+					End(printStatus)
+			}
+			fmt.Println(string(fprotJSON))
+		}
+	}
+
+	err := app.Run(os.Args)
 	assert(err)
 
-	fmt.Println(string(clamavJSON))
+	// if len(os.Args) < 2 {
+	// 	fmt.Println("[ERROR] Missing input file.")
+	// 	os.Exit(2)
+	// }
+	// if len(os.Args) == 2 && os.Args[1] == "--version" {
+	// 	fmt.Println("Version: ", Version)
+	// 	fmt.Println("BuildTime: ", BuildTime)
+	// 	os.Exit(0)
+	// }
+	//
+	// path := os.Args[1]
+	//
+	// if _, err := os.Stat(path); os.IsNotExist(err) {
+	// 	assert(err)
+	// }
+	//
+	// clamOutput := RunCommand("/usr/bin/clamscan", "--stdout", path)
+	// // fmt.Println(ParseClamAvOutput(clamOutput))
+	//
+	// clamavJSON, err := json.Marshal(ClamAV{
+	// 	Results: ParseClamAvOutput(clamOutput),
+	// })
+	// assert(err)
+	//
+	// fmt.Println(string(clamavJSON))
 }
