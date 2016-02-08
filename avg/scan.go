@@ -77,7 +77,8 @@ func ParseAVGOutput(avgout string, path string) ResultsData {
 				colonSeparated = append(colonSeparated, line)
 			}
 			if strings.Contains(line, path) {
-				avg.Result = strings.TrimLeft(line, path)
+				pathVirusString := strings.Split(line, "  ")
+				avg.Result = strings.TrimSpace(pathVirusString[1])
 			}
 		}
 	}
@@ -93,7 +94,7 @@ func ParseAVGOutput(avgout string, path string) ResultsData {
 					case strings.Contains(line, "Virus database version"):
 						avg.Database = strings.TrimSpace(keyvalue[1])
 					case strings.Contains(line, "Virus database release date"):
-						avg.Updated = strings.TrimSpace(keyvalue[1])
+						avg.Updated = strings.TrimSpace(strings.TrimPrefix(line, "Virus database release date:"))
 					case strings.Contains(line, "Infections found"):
 						if strings.Contains(keyvalue[1], "1") {
 							avg.Infected = true
