@@ -51,7 +51,6 @@ func assert(err error) {
 // RunCommand runs cmd on file
 func RunCommand(cmd string, args ...string) string {
 
-	_, err := exec.Command("/etc/init.d/avgd", "start").Output()
 	cmdOut, err := exec.Command(cmd, args...).Output()
 	if len(cmdOut) == 0 {
 		assert(err)
@@ -196,6 +195,9 @@ func main() {
 		if _, err := os.Stat(path); os.IsNotExist(err) {
 			assert(err)
 		}
+
+		// AVG needs to have the daemon started first
+		exec.Command("/etc/init.d/avgd", "start").Output()
 
 		avg := AVG{
 			Results: ParseAVGOutput(RunCommand("/usr/bin/avgscan", path), path),
