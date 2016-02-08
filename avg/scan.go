@@ -20,17 +20,17 @@ var Version string
 // BuildTime stores the plugin's build time
 var BuildTime string
 
-// ClamAV json object
-type ClamAV struct {
-	Results ResultsData `json:"clamav"`
+// AVG json object
+type AVG struct {
+	Results ResultsData `json:"avg"`
 }
 
 // ResultsData json object
 type ResultsData struct {
 	Infected bool   `json:"infected"`
 	Result   string `json:"result"`
-	Engine   string `json:"engine"`
-	Known    string `json:"known"`
+	Version  string `json:"engine"`
+	Database string `json:"database"`
 	Updated  string `json:"updated"`
 }
 
@@ -51,6 +51,7 @@ func assert(err error) {
 // RunCommand runs cmd on file
 func RunCommand(cmd string, args ...string) string {
 
+	_, err := exec.Command("/etc/init.d/avgd", "start").Output()
 	cmdOut, err := exec.Command(cmd, args...).Output()
 	if len(cmdOut) == 0 {
 		assert(err)
@@ -59,59 +60,86 @@ func RunCommand(cmd string, args ...string) string {
 	return string(cmdOut)
 }
 
-// ParseClamAvOutput convert clamav output into ClamAV struct
-func ParseClamAvOutput(clamout string) ResultsData {
+// ParseAVGOutput convert avg output into ResultsData struct
+func ParseAVGOutput(avgout string, path string) ResultsData {
 
-	clamAV := ResultsData{}
+	avg := ResultsData{
+		Infected: false,
+		Version:  getAvgVersion(),
+	}
+	colonSeparated := []string{}
 
-	lines := strings.Split(clamout, "\n")
-	// Extract AV Scan Result
-	result := lines[0]
-	if len(result) != 0 {
-		pathAndResult := strings.Split(result, ":")
-		if strings.Contains(pathAndResult[1], "OK") {
-			clamAV.Infected = false
-		} else {
-			clamAV.Infected = true
-			clamAV.Result = strings.TrimSpace(strings.TrimRight(pathAndResult[1], "FOUND"))
+	lines := strings.Split(avgout, "\n")
+	// Extract Virus string and extract colon separated lines into an slice
+	for _, line := range lines {
+		if len(line) != 0 {
+			if strings.Contains(line, ":") {
+				colonSeparated = append(colonSeparated, line)
+			}
+			if strings.Contains(line, path) {
+				avg.Result = strings.TrimLeft(line, path)
+			}
+		}
+	}
+	// fmt.Println(lines)
+
+	// Extract AVG Details from scan output
+	if len(colonSeparated) != 0 {
+		for _, line := range colonSeparated {
+			if len(line) != 0 {
+				keyvalue := strings.Split(line, ":")
+				if len(keyvalue) != 0 {
+					switch {
+					case strings.Contains(line, "Virus database version"):
+						avg.Database = strings.TrimSpace(keyvalue[1])
+					case strings.Contains(line, "Virus database release date"):
+						avg.Updated = strings.TrimSpace(keyvalue[1])
+					case strings.Contains(line, "Infections found"):
+						if strings.Contains(keyvalue[1], "1") {
+							avg.Infected = true
+						}
+					}
+				}
+			}
 		}
 	} else {
-		fmt.Println("[ERROR] empty scan result: ", result)
+		fmt.Println("[ERROR] colonSeparated was empty: ", colonSeparated)
 		os.Exit(2)
 	}
-	// Extract Clam Details from SCAN SUMMARY
-	for _, line := range lines[1:] {
+
+	return avg
+}
+
+// Get Anti-Virus scanner version
+func getAvgVersion() string {
+	versionOut := RunCommand("/usr/bin/avgscan", "-v")
+	lines := strings.Split(versionOut, "\n")
+	for _, line := range lines {
 		if len(line) != 0 {
 			keyvalue := strings.Split(line, ":")
 			if len(keyvalue) != 0 {
-				switch {
-				case strings.Contains(keyvalue[0], "Known viruses"):
-					clamAV.Known = strings.TrimSpace(keyvalue[1])
-				case strings.Contains(line, "Engine version"):
-					clamAV.Engine = strings.TrimSpace(keyvalue[1])
+				if strings.Contains(keyvalue[0], "Anti-Virus scanner version") {
+					return strings.TrimSpace(keyvalue[1])
 				}
 			}
 		}
 	}
-
-	clamAV.Updated = BuildTime
-
-	return clamAV
+	return ""
 }
 
 func printStatus(resp gorequest.Response, body string, errs []error) {
 	fmt.Println(resp.Status)
 }
 
-func printMarkDownTable(clamav ClamAV) {
-	fmt.Println("#### ClamAV")
-	table := clitable.New([]string{"Infected", "Result", "Engine", "Known", "Updated"})
+func printMarkDownTable(avg AVG) {
+
+	fmt.Println("#### AVG")
+	table := clitable.New([]string{"Infected", "Result", "Version", "Updated"})
 	table.AddRow(map[string]interface{}{
-		"Infected": clamav.Results.Infected,
-		"Result":   clamav.Results.Result,
-		"Engine":   clamav.Results.Engine,
-		"Known":    clamav.Results.Known,
-		"Updated":  clamav.Results.Updated,
+		"Infected": avg.Results.Infected,
+		"Result":   avg.Results.Result,
+		"Version":  avg.Results.Version,
+		"Updated":  avg.Results.Updated,
 	})
 	table.Markdown = true
 	table.Print()
@@ -139,12 +167,12 @@ Run '{{.Name}} COMMAND --help' for more information on a command.
 func main() {
 	cli.AppHelpTemplate = appHelpTemplate
 	app := cli.NewApp()
-	app.Name = "clamav"
+	app.Name = "avg"
 	app.Author = "blacktop"
 	app.Email = "https://github.com/blacktop"
 	app.Version = Version + ", BuildTime: " + BuildTime
 	app.Compiled, _ = time.Parse("20060102", BuildTime)
-	app.Usage = "Malice ClamAV Plugin"
+	app.Usage = "Malice AVG AntiVirus Plugin"
 	app.Flags = []cli.Flag{
 		cli.BoolFlag{
 			Name:  "table, t",
@@ -168,14 +196,14 @@ func main() {
 			assert(err)
 		}
 
-		clamav := ClamAV{
-			Results: ParseClamAvOutput(RunCommand("/usr/bin/clamscan", "--stdout", path)),
+		avg := AVG{
+			Results: ParseAVGOutput(RunCommand("/usr/bin/avgscan", path), path),
 		}
 
 		if c.Bool("table") {
-			printMarkDownTable(clamav)
+			printMarkDownTable(avg)
 		} else {
-			fprotJSON, err := json.Marshal(clamav)
+			avgJSON, err := json.Marshal(avg)
 			assert(err)
 			if c.Bool("post") {
 				request := gorequest.New()
@@ -184,10 +212,10 @@ func main() {
 				}
 				request.Post(os.Getenv("MALICE_ENDPOINT")).
 					Set("Task", path).
-					Send(fprotJSON).
+					Send(avgJSON).
 					End(printStatus)
 			}
-			fmt.Println(string(fprotJSON))
+			fmt.Println(string(avgJSON))
 		}
 	}
 

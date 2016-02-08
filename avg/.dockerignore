@@ -1,0 +1,8 @@
+# Ignore .git folder
+.git*
+
+.gitignore
+README.md
+LICENSE
+
+avg/avg2013flx-r3118-a6926.i386.deb

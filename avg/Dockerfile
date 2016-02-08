@@ -1,32 +1,41 @@
 FROM debian:jessie
+
 MAINTAINER blacktop, https://github.com/blacktop
 
-#Prevent daemon start during install
-RUN echo '#!/bin/sh\nexit 101' > /usr/sbin/policy-rc.d && \
-    chmod +x /usr/sbin/policy-rc.d
-
 # Install Requirements
-RUN apt-get update -qq && apt-get install -yq libc6-i386
+COPY . /go/src/github.com/maliceio/malice-avg
+RUN buildDeps='ca-certificates \
+               build-essential \
+               golang-go \
+               mercurial \
+               git-core \
+               unzip \
+               curl' \
+  && set -x \
+  && apt-get update -qq \
+  && apt-get install -yq $buildDeps libc6-i386 --no-install-recommends \
+  && set -x \
+  && echo "Install AVG..." \
+  && curl -Ls http://download.avgfree.com/filedir/inst/avg2013flx-r3118-a6926.i386.deb > /tmp/avg.deb \
+  && dpkg -i /tmp/avg.deb \
+  && /etc/init.d/avgd restart && avgupdate \
+  && avgcfgctl -w UpdateVir.sched.Task.Disabled=true \
+  && avgcfgctl -w Default.setup.daemonize=false   \
+  && echo "Building info Go binary..." \
+  && cd /go/src/github.com/maliceio/malice-avg \
+  && export GOPATH=/go \
+  && go get \
+  && go build -ldflags "-X main.Version $(cat VERSION) -X main.BuildTime=$(date -u +%Y%m%d)" -o /bin/scan
+  # && echo "Clean up unnecessary files..." \
+  # && apt-get purge -y --auto-remove $buildDeps \
+  # && apt-get clean \
+  # && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /go
 
-# Add Files
-ADD /run.sh /run.sh
-RUN chmod 755 /*.sh
 # Add EICAR Test Virus File to malware folder
 ADD http://www.eicar.org/download/eicar.com.txt /malware/EICAR
-# Get AVG Installer
-ADD http://download.avgfree.com/filedir/inst/avg2013flx-r3118-a6926.i386.deb /avg/
-
-# Install AVG
-RUN dpkg -i /avg/avg2013flx-r3118-a6926.i386.deb
-
-# Start AVG Service and Update AVG Definitions
-RUN /etc/init.d/avgd restart && avgupdate
-RUN avgcfgctl -w UpdateVir.sched.Task.Disabled=true
-RUN avgcfgctl -w Default.setup.daemonize=false
-
-# Try to reduce size of container.
-RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 WORKDIR /malware
 
-CMD ["/run.sh"]
+ENTRYPOINT ["/bin/scan"]
+
+CMD ["--help"]

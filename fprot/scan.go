@@ -78,7 +78,7 @@ func ParseFprotOutput(fprotout string) ResultsData {
 					fprot.Result = result
 					fprot.Infected = true
 				} else {
-					fmt.Println("[ERROR] colonSeparated was empty: ", colonSeparated)
+					fmt.Println("[ERROR] Virus name extracted was empty: ", result)
 					os.Exit(2)
 				}
 			}
