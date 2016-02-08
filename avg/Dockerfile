@@ -25,11 +25,11 @@ RUN buildDeps='ca-certificates \
   && cd /go/src/github.com/maliceio/malice-avg \
   && export GOPATH=/go \
   && go get \
-  && go build -ldflags "-X main.Version $(cat VERSION) -X main.BuildTime=$(date -u +%Y%m%d)" -o /bin/scan
-  # && echo "Clean up unnecessary files..." \
-  # && apt-get purge -y --auto-remove $buildDeps \
-  # && apt-get clean \
-  # && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /go
+  && go build -ldflags "-X main.Version $(cat VERSION) -X main.BuildTime=$(date -u +%Y%m%d)" -o /bin/scan \
+  && echo "Clean up unnecessary files..." \
+  && apt-get purge -y --auto-remove $buildDeps \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /go
 
 # Add EICAR Test Virus File to malware folder
 ADD http://www.eicar.org/download/eicar.com.txt /malware/EICAR
