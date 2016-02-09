@@ -23,9 +23,10 @@ RUN buildDeps='ca-certificates \
   && avgcfgctl -w Default.setup.daemonize=false   \
   && echo "Building info Go binary..." \
   && cd /go/src/github.com/maliceio/malice-avg \
-  && export GOPATH=/go \
-  && go get \
-  && go build -ldflags "-X main.Version $(cat VERSION) -X main.BuildTime=$(date -u +%Y%m%d)" -o /bin/scan \
+	&& export GOPATH=/go \
+  && go version \
+	&& go get \
+	&& go build -ldflags "-X main.Version $(cat VERSION) -X main.BuildTime $(date -u +%Y%m%d)" -o /bin/scan \
   && echo "Clean up unnecessary files..." \
   && apt-get purge -y --auto-remove $buildDeps \
   && apt-get clean \
