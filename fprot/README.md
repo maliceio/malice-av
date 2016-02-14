@@ -29,7 +29,7 @@ Usage: fprot [OPTIONS] COMMAND [arg...]
 
 Malice F-PROT AntiVirus Plugin
 
-Version: v0.1.0, BuildTime: 20160114
+Version: v0.1.0, BuildTime:
 
 Author:
   blacktop - <https://github.com/blacktop>
@@ -43,7 +43,7 @@ Options:
 
 Commands:
   update	Update virus definitions
-  help	  Shows a list of commands or help for one command
+  help		Shows a list of commands or help for one command
 
 Run 'fprot COMMAND --help' for more information on a command.
 ```

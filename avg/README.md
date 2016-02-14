@@ -29,7 +29,7 @@ Usage: avg [OPTIONS] COMMAND [arg...]
 
 Malice AVG AntiVirus Plugin
 
-Version: v0.1.0, BuildTime: 20160209
+Version: v0.1.0, BuildTime: 20160214
 
 Author:
   blacktop - <https://github.com/blacktop>
@@ -43,7 +43,7 @@ Options:
 
 Commands:
   update	Update virus definitions
-  help	  Shows a list of commands or help for one command
+  help		Shows a list of commands or help for one command
 
 Run 'avg COMMAND --help' for more information on a command.
 ```
