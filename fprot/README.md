@@ -57,7 +57,7 @@ This will output to stdout and POST to malice results API webhook endpoint.
     "infected": true,
     "result": "EICAR_Test_File (exact)",
     "engine": "4.6.5.141",
-    "updated": "201601110435"
+    "updated": "20160213"
   }
 }
 ```

@@ -58,7 +58,7 @@ This will output to stdout and POST to malice results API webhook endpoint.
     "result": "Virus identified EICAR_Test",
     "engine": "13.0.3114",
     "database": "4477/11588",
-    "updated": "Tue, 09 Feb 2016 00:27:00 +0000"
+    "updated": "20160213"
   }
 }
 ```

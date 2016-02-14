@@ -59,7 +59,7 @@ This will output to stdout and POST to malice results API webhook endpoint.
     "result": "Eicar-Test-Signature",
     "engine": "0.99",
     "known": "4213581",
-    "updated": "20160112"
+    "updated": "20160213"
   }
 }
 ```
@@ -68,7 +68,7 @@ This will output to stdout and POST to malice results API webhook endpoint.
 #### ClamAV
 | Infected | Result               | Engine | Updated  |
 | -------- | -------------------- | ------ | -------- |
-| true     | Eicar-Test-Signature | 0.99   | 20160115 |
+| true     | Eicar-Test-Signature | 0.99   | 20160213 |
 ---
 ### To Run on OSX
  - Install [Homebrew](http://brew.sh)
