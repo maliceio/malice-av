@@ -29,8 +29,9 @@ RUN buildDeps='ca-certificates \
   && echo "Building info Go binary..." \
   && cd /go/src/github.com/maliceio/malice-fprot \
   && export GOPATH=/go \
+  && go version \
   && go get \
-  && go build -ldflags "-X main.Version $(cat VERSION) -X main.BuildTime=$(date -u +%Y%m%d)" -o /bin/scan \
+  && go build -ldflags "-X main.Version $(cat VERSION) -X main.BuildTime $(date -u +%Y%m%d)" -o /bin/scan \
   && echo "Clean up unnecessary files..." \
   && apt-get purge -y --auto-remove $buildDeps \
   && apt-get clean \

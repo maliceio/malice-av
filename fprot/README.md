@@ -29,7 +29,7 @@ Usage: fprot [OPTIONS] COMMAND [arg...]
 
 Malice F-PROT AntiVirus Plugin
 
-Version: v0.1.0, BuildTime:
+Version: v0.1.0, BuildTime: 20160214
 
 Author:
   blacktop - <https://github.com/blacktop>
