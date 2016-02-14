@@ -137,6 +137,10 @@ func printMarkDownTable(fprot FPROT) {
 	table.Print()
 }
 
+func updateAV() {
+	fmt.Println(RunCommand("/opt/f-prot/fpupdate"))
+}
+
 var appHelpTemplate = `Usage: {{.Name}} {{if .Flags}}[OPTIONS] {{end}}COMMAND [arg...]
 
 {{.Usage}}
@@ -179,6 +183,16 @@ func main() {
 			Name:   "proxy, x",
 			Usage:  "proxy settings for Malice webhook endpoint",
 			EnvVar: "MALICE_PROXY",
+		},
+	}
+	app.Commands = []cli.Command{
+		{
+			Name:    "update",
+			Aliases: []string{"u"},
+			Usage:   "Update virus definitions",
+			Action: func(c *cli.Context) {
+				updateAV()
+			},
 		},
 	}
 	app.Action = func(c *cli.Context) {

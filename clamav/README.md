@@ -43,7 +43,8 @@ Options:
   --version, -v	print the version
 
 Commands:
-  help	Shows a list of commands or help for one command
+  update	Update virus definitions
+  help	  Shows a list of commands or help for one command
 
 Run 'clamav COMMAND --help' for more information on a command.
 ```
@@ -65,9 +66,9 @@ This will output to stdout and POST to malice results API webhook endpoint.
 ### Sample Output STDOUT (Markdown Table):
 ---
 #### ClamAV
-| Infected | Result               | Engine | Known   | Updated  |
-| -------- | -------------------- | ------ | ------- | -------- |
-| true     | Eicar-Test-Signature | 0.99   | 4218998 | 20160115 |
+| Infected | Result               | Engine | Updated  |
+| -------- | -------------------- | ------ | -------- |
+| true     | Eicar-Test-Signature | 0.99   | 20160115 |
 ---
 ### To Run on OSX
  - Install [Homebrew](http://brew.sh)

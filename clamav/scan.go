@@ -105,16 +105,20 @@ func printStatus(resp gorequest.Response, body string, errs []error) {
 
 func printMarkDownTable(clamav ClamAV) {
 	fmt.Println("#### ClamAV")
-	table := clitable.New([]string{"Infected", "Result", "Engine", "Known", "Updated"})
+	table := clitable.New([]string{"Infected", "Result", "Engine", "Updated"})
 	table.AddRow(map[string]interface{}{
 		"Infected": clamav.Results.Infected,
 		"Result":   clamav.Results.Result,
 		"Engine":   clamav.Results.Engine,
-		"Known":    clamav.Results.Known,
-		"Updated":  clamav.Results.Updated,
+		// "Known":    clamav.Results.Known,
+		"Updated": clamav.Results.Updated,
 	})
 	table.Markdown = true
 	table.Print()
+}
+
+func updateAV() {
+	fmt.Println(RunCommand("freshclam"))
 }
 
 var appHelpTemplate = `Usage: {{.Name}} {{if .Flags}}[OPTIONS] {{end}}COMMAND [arg...]
@@ -159,6 +163,16 @@ func main() {
 			Name:   "proxy, x",
 			Usage:  "proxy settings for Malice webhook endpoint",
 			EnvVar: "MALICE_PROXY",
+		},
+	}
+	app.Commands = []cli.Command{
+		{
+			Name:    "update",
+			Aliases: []string{"u"},
+			Usage:   "Update virus definitions",
+			Action: func(c *cli.Context) {
+				updateAV()
+			},
 		},
 	}
 	app.Action = func(c *cli.Context) {

@@ -36,11 +36,11 @@ RUN buildDeps='ca-certificates \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /go
 
-# Update F-PROT Definitions
-RUN /opt/f-prot/fpupdate
-
 # Add EICAR Test Virus File to malware folder
 ADD http://www.eicar.org/download/eicar.com.txt /malware/EICAR
+
+# Update F-PROT Definitions
+RUN /opt/f-prot/fpupdate
 
 WORKDIR /malware
 

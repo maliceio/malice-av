@@ -29,7 +29,7 @@ type AVG struct {
 type ResultsData struct {
 	Infected bool   `json:"infected"`
 	Result   string `json:"result"`
-	Version  string `json:"engine"`
+	Engine   string `json:"engine"`
 	Database string `json:"database"`
 	Updated  string `json:"updated"`
 }
@@ -64,7 +64,7 @@ func ParseAVGOutput(avgout string, path string) ResultsData {
 
 	avg := ResultsData{
 		Infected: false,
-		Version:  getAvgVersion(),
+		Engine:   getAvgVersion(),
 	}
 	colonSeparated := []string{}
 
@@ -93,7 +93,8 @@ func ParseAVGOutput(avgout string, path string) ResultsData {
 					case strings.Contains(line, "Virus database version"):
 						avg.Database = strings.TrimSpace(keyvalue[1])
 					case strings.Contains(line, "Virus database release date"):
-						avg.Updated = strings.TrimSpace(strings.TrimPrefix(line, "Virus database release date:"))
+						date := strings.TrimSpace(strings.TrimPrefix(line, "Virus database release date:"))
+						avg.Updated = parseUpdatedDate(date)
 					case strings.Contains(line, "Infections found"):
 						if strings.Contains(keyvalue[1], "1") {
 							avg.Infected = true
@@ -127,18 +128,31 @@ func getAvgVersion() string {
 	return ""
 }
 
+func parseUpdatedDate(date string) string {
+	layout := "Mon, 02 Jan 2006 15:04:05 +0000"
+	t, _ := time.Parse(layout, date)
+	return fmt.Sprintf("%[1]d%[2]d%[3]d", t.Year(), t.Month(), t.Day())
+}
+
 func printStatus(resp gorequest.Response, body string, errs []error) {
 	fmt.Println(resp.Status)
+}
+
+func updateAV() {
+	// AVG needs to have the daemon started first
+	exec.Command("/etc/init.d/avgd", "start").Output()
+
+	fmt.Println(RunCommand("avgupdate"))
 }
 
 func printMarkDownTable(avg AVG) {
 
 	fmt.Println("#### AVG")
-	table := clitable.New([]string{"Infected", "Result", "Version", "Updated"})
+	table := clitable.New([]string{"Infected", "Result", "Engine", "Updated"})
 	table.AddRow(map[string]interface{}{
 		"Infected": avg.Results.Infected,
 		"Result":   avg.Results.Result,
-		"Version":  avg.Results.Version,
+		"Engine":   avg.Results.Engine,
 		"Updated":  avg.Results.Updated,
 	})
 	table.Markdown = true
@@ -187,6 +201,16 @@ func main() {
 			Name:   "proxy, x",
 			Usage:  "proxy settings for Malice webhook endpoint",
 			EnvVar: "MALICE_PROXY",
+		},
+	}
+	app.Commands = []cli.Command{
+		{
+			Name:    "update",
+			Aliases: []string{"u"},
+			Usage:   "Update virus definitions",
+			Action: func(c *cli.Context) {
+				updateAV()
+			},
 		},
 	}
 	app.Action = func(c *cli.Context) {

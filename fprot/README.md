@@ -42,7 +42,8 @@ Options:
   --version, -v	print the version
 
 Commands:
-  help	Shows a list of commands or help for one command
+  update	Update virus definitions
+  help	  Shows a list of commands or help for one command
 
 Run 'fprot COMMAND --help' for more information on a command.
 ```

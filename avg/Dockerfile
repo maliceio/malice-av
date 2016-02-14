@@ -18,7 +18,7 @@ RUN buildDeps='ca-certificates \
   && echo "Install AVG..." \
   && curl -Ls http://download.avgfree.com/filedir/inst/avg2013flx-r3118-a6926.i386.deb > /tmp/avg.deb \
   && dpkg -i /tmp/avg.deb \
-  && /etc/init.d/avgd restart && avgupdate \
+  && /etc/init.d/avgd restart \
   && avgcfgctl -w UpdateVir.sched.Task.Disabled=true \
   && avgcfgctl -w Default.setup.daemonize=false   \
   && echo "Building info Go binary..." \
@@ -34,6 +34,9 @@ RUN buildDeps='ca-certificates \
 
 # Add EICAR Test Virus File to malware folder
 ADD http://www.eicar.org/download/eicar.com.txt /malware/EICAR
+
+# Update AVG Definitions
+RUN /etc/init.d/avgd restart && avgupdate
 
 WORKDIR /malware
 
