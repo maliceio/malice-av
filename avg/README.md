@@ -65,9 +65,9 @@ This will output to stdout and POST to malice results API webhook endpoint.
 ### Sample Output STDOUT (Markdown Table):
 ---
 #### AVG
-| Infected | Result                      | Engine    | Updated                         |
-| -------- | --------------------------- | --------- | ------------------------------- |
-| true     | Virus identified EICAR_Test | 13.0.3114 | Tue, 09 Feb 2016 00:27:00 +0000 |
+| Infected | Result                      | Engine    | Updated  |
+| -------- | --------------------------- | --------- | -------- |
+| true     | Virus identified EICAR_Test | 13.0.3114 | 20160213 |
 ---
 ### To Run on OSX
  - Install [Homebrew](http://brew.sh)

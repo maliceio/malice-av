@@ -64,9 +64,9 @@ This will output to stdout and POST to malice results API webhook endpoint.
 ### Sample Output STDOUT (Markdown Table):
 ---
 #### F-PROT
-| Infected | Result                  | Engine    | Updated      |
-| -------- | ----------------------- | --------- | ------------ |
-| true     | EICAR_Test_File (exact) | 4.6.5.141 | 201601140816 |
+| Infected | Result                  | Engine    | Updated    |
+| -------- | ----------------------- | --------- | ---------- |
+| true     | EICAR_Test_File (exact) | 4.6.5.141 | 20160213   |
 ---
 ### To Run on OSX
  - Install [Homebrew](http://brew.sh)
