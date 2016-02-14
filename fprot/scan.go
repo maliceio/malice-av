@@ -94,7 +94,7 @@ func ParseFprotOutput(fprotout string) ResultsData {
 				if len(keyvalue) != 0 {
 					switch {
 					case strings.Contains(keyvalue[0], "Virus signatures"):
-						fprot.Updated = strings.TrimSpace(keyvalue[1])
+						fprot.Updated = parseUpdatedDate(strings.TrimSpace(keyvalue[1]))
 					case strings.Contains(line, "Engine version"):
 						fprot.Engine = strings.TrimSpace(keyvalue[1])
 					}
@@ -121,6 +121,12 @@ func extractVirusName(line string) string {
 
 func printStatus(resp gorequest.Response, body string, errs []error) {
 	fmt.Println(resp.Status)
+}
+
+func parseUpdatedDate(date string) string {
+	layout := "200601021504"
+	t, _ := time.Parse(layout, date)
+	return fmt.Sprintf("%[1]d%[2]d%[3]d", t.Year(), t.Month(), t.Day())
 }
 
 func printMarkDownTable(fprot FPROT) {
