@@ -118,6 +118,7 @@ func printMarkDownTable(clamav ClamAV) {
 }
 
 func updateAV() {
+	fmt.Println("Updating ClamAV...")
 	fmt.Println(RunCommand("freshclam"))
 }
 

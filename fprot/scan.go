@@ -126,7 +126,7 @@ func printStatus(resp gorequest.Response, body string, errs []error) {
 func parseUpdatedDate(date string) string {
 	layout := "200601021504"
 	t, _ := time.Parse(layout, date)
-	return fmt.Sprintf("%[1]d%[2]d%[3]d", t.Year(), t.Month(), t.Day())
+	return fmt.Sprintf("%d%02d%02d", t.Year(), t.Month(), t.Day())
 }
 
 func printMarkDownTable(fprot FPROT) {
@@ -144,6 +144,7 @@ func printMarkDownTable(fprot FPROT) {
 }
 
 func updateAV() {
+	fmt.Println("Updating F-PROT...")
 	fmt.Println(RunCommand("/opt/f-prot/fpupdate"))
 }
 

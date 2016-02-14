@@ -105,6 +105,7 @@ func ParseAVGOutput(avgout string, path string) ResultsData {
 		}
 	} else {
 		fmt.Println("[ERROR] colonSeparated was empty: ", colonSeparated)
+		fmt.Printf("[ERROR] AVG output was: \n%s", avgout)
 		os.Exit(2)
 	}
 
@@ -131,7 +132,7 @@ func getAvgVersion() string {
 func parseUpdatedDate(date string) string {
 	layout := "Mon, 02 Jan 2006 15:04:05 +0000"
 	t, _ := time.Parse(layout, date)
-	return fmt.Sprintf("%[1]d%[2]d%[3]d", t.Year(), t.Month(), t.Day())
+	return fmt.Sprintf("%d%02d%02d", t.Year(), t.Month(), t.Day())
 }
 
 func printStatus(resp gorequest.Response, body string, errs []error) {
@@ -139,6 +140,7 @@ func printStatus(resp gorequest.Response, body string, errs []error) {
 }
 
 func updateAV() {
+	fmt.Println("Updating AVG...")
 	// AVG needs to have the daemon started first
 	exec.Command("/etc/init.d/avgd", "start").Output()
 
