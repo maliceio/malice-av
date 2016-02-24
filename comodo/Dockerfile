@@ -1,5 +1,4 @@
 FROM ubuntu:precise
-# FROM debian:wheezy
 
 MAINTAINER blacktop, https://github.com/blacktop
 
@@ -25,8 +24,6 @@ RUN buildDeps='ca-certificates \
   && echo "Building info Go binary..." \
   && cd /go/src/github.com/maliceio/malice-comodo \
   && export GOPATH=/go \
-  && export GOROOT=/usr/lib/go \
-  && export GOBIN=/usr/bin/go \
   && go version \
   && go get \
   && go build -ldflags "-X main.Version $(cat VERSION) -X main.BuildTime $(date -u +%Y%m%d)" -o /bin/scan \
@@ -45,7 +42,3 @@ WORKDIR /malware
 ENTRYPOINT ["/bin/scan"]
 
 CMD ["--help"]
-
-# ENTRYPOINT ["/opt/COMODO/cmdscan"]
-# CMD ["-h"]
-# https://www.comodo.com/home/download/download.php?prod=antivirus-for-linux&track=3646&key5sk1=d82d6db0f348102920396141261143422f068300#
