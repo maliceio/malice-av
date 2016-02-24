@@ -7,11 +7,13 @@ COPY . /go/src/github.com/maliceio/malice-comodo
 RUN buildDeps='ca-certificates \
                build-essential \
                libssl-dev \
-               golang-go \
+               golang \
                mercurial \
                git-core \
                gdebi \
                curl' \
+  && apt-get install -yq python-software-properties \
+  && add-apt-repository ppa:duh/golang \
   && apt-get update -qq \
   && apt-get install -yq $buildDeps \
   && set -x \
@@ -23,19 +25,20 @@ RUN buildDeps='ca-certificates \
   && echo "Building info Go binary..." \
   && cd /go/src/github.com/maliceio/malice-comodo \
   && export GOPATH=/go \
+  && export GOROOT=/usr/lib/go \
+  && export GOBIN=/usr/bin/go \
   && go version \
   && go get \
   && go build -ldflags "-X main.Version $(cat VERSION) -X main.BuildTime $(date -u +%Y%m%d)" -o /bin/scan \
   && echo "Clean up unnecessary files..." \
-  && apt-get purge -y --auto-remove $buildDeps \
+  && apt-get purge -y --auto-remove $buildDeps python-software-properties \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /go
 
-# Add EICAR Test Virus File to malware folder
-ADD http://www.eicar.org/download/eicar.com.txt /malware/EICAR
-
 # Update Comodo definitions
 ADD http://download.comodo.com/av/updates58/sigs/bases/bases.cav /opt/COMODO/scanners/bases.cav
+# Add EICAR Test Virus File to malware folder
+ADD http://www.eicar.org/download/eicar.com.txt /malware/EICAR
 
 WORKDIR /malware
 
