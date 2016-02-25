@@ -214,10 +214,10 @@ func main() {
 			Results: ParseComodoOutput(RunCommand("/opt/COMODO/cmdscan", "-vs", path)),
 		}
 		// -----== Scan Start ==-----
-		// /malware/EICAR ---> Not Virus
+		// /malware/EICAR ---> Found Virus, Malware Name is Malware
 		// -----== Scan End ==-----
 		// Number of Scanned Files: 1
-		// Number of Found Viruses: 0
+		// Number of Found Viruses: 1
 		if c.Bool("table") {
 			printMarkDownTable(comodo)
 		} else {

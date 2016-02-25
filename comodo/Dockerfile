@@ -9,12 +9,11 @@ RUN buildDeps='ca-certificates \
                golang \
                mercurial \
                git-core \
-               gdebi \
                curl' \
   && apt-get install -yq python-software-properties \
   && add-apt-repository ppa:duh/golang \
   && apt-get update -qq \
-  && apt-get install -yq $buildDeps \
+  && apt-get install -yq $buildDeps gdebi \
   && set -x \
   && echo "Install Comodo..." \
   && curl -Ls http://download.comodo.com/cavmgl/download/installs/1000/standalone/cav-linux_1.1.268025-1_amd64.deb > /tmp/cav-linux_1.1.268025-1_amd64.deb \
