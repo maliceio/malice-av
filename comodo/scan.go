@@ -125,6 +125,10 @@ func updateAV() {
 	response, err := grequests.Get("http://download.comodo.com/av/updates58/sigs/bases/bases.cav", nil)
 	assert(err)
 
+	if response.Ok != true {
+		log.Println("Request did not return OK")
+	}
+
 	if err := response.DownloadToFile("/opt/COMODO/scanners/bases.cav"); err != nil {
 		log.Println("Unable to download file: ", err)
 	}
