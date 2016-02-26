@@ -6,12 +6,12 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	"regexp"
 	"strings"
 	"time"
 
 	"github.com/codegangsta/cli"
 	"github.com/crackcomm/go-clitable"
+	"github.com/levigross/grequests"
 	"github.com/parnurzeal/gorequest"
 )
 
@@ -62,17 +62,19 @@ func RunCommand(cmd string, args ...string) string {
 // ParseComodoOutput convert comodo output into ResultsData struct
 func ParseComodoOutput(comodoout string) ResultsData {
 
-	comodo := ResultsData{Infected: false}
-	colonSeparated := []string{}
+	comodo := ResultsData{Infected: false, Engine: "1.1", Updated: BuildTime}
+	// -----== Scan Start ==-----
+	// /malware/EICAR ---> Found Virus, Malware Name is Malware
+	// -----== Scan End ==-----
+	// Number of Scanned Files: 1
+	// Number of Found Viruses: 1
 
 	lines := strings.Split(comodoout, "\n")
+	fmt.Println(lines)
 	// Extract Virus string and extract colon separated lines into an slice
 	for _, line := range lines {
 		if len(line) != 0 {
-			if strings.Contains(line, ":") {
-				colonSeparated = append(colonSeparated, line)
-			}
-			if strings.Contains(line, "[Found virus]") {
+			if strings.Contains(line, "Found Virus") {
 				result := extractVirusName(line)
 				if len(result) != 0 {
 					comodo.Result = result
@@ -84,39 +86,14 @@ func ParseComodoOutput(comodoout string) ResultsData {
 			}
 		}
 	}
-	// fmt.Println(lines)
-
-	// Extract Comodo Details from scan output
-	if len(colonSeparated) != 0 {
-		for _, line := range colonSeparated {
-			if len(line) != 0 {
-				keyvalue := strings.Split(line, ":")
-				if len(keyvalue) != 0 {
-					switch {
-					case strings.Contains(keyvalue[0], "Virus signatures"):
-						comodo.Updated = parseUpdatedDate(strings.TrimSpace(keyvalue[1]))
-					case strings.Contains(line, "Engine version"):
-						comodo.Engine = strings.TrimSpace(keyvalue[1])
-					}
-				}
-			}
-		}
-	} else {
-		fmt.Println("[ERROR] colonSeparated was empty: ", colonSeparated)
-		os.Exit(2)
-	}
 
 	return comodo
 }
 
 // extractVirusName extracts Virus name from scan results string
 func extractVirusName(line string) string {
-	r := regexp.MustCompile(`<(.+)>`)
-	res := r.FindStringSubmatch(line)
-	if len(res) != 2 {
-		return ""
-	}
-	return res[1]
+	keyvalue := strings.Split(line, "is")
+	return strings.TrimSpace(keyvalue[1])
 }
 
 func printStatus(resp gorequest.Response, body string, errs []error) {
@@ -145,8 +122,12 @@ func printMarkDownTable(comodo Comodo) {
 
 func updateAV() {
 	fmt.Println("Updating Comodo...")
-	// TODO: I need to download the update files
-	// http://download.comodo.com/av/updates58/sigs/bases/bases.cav /opt/COMODO/scanners/bases.cav
+	response, err := grequests.Get("http://download.comodo.com/av/updates58/sigs/bases/bases.cav", nil)
+	assert(err)
+
+	if err := response.DownloadToFile("/opt/COMODO/scanners/bases.cav"); err != nil {
+		log.Println("Unable to download file: ", err)
+	}
 }
 
 var appHelpTemplate = `Usage: {{.Name}} {{if .Flags}}[OPTIONS] {{end}}COMMAND [arg...]
@@ -213,11 +194,7 @@ func main() {
 		comodo := Comodo{
 			Results: ParseComodoOutput(RunCommand("/opt/COMODO/cmdscan", "-vs", path)),
 		}
-		// -----== Scan Start ==-----
-		// /malware/EICAR ---> Found Virus, Malware Name is Malware
-		// -----== Scan End ==-----
-		// Number of Scanned Files: 1
-		// Number of Found Viruses: 1
+
 		if c.Bool("table") {
 			printMarkDownTable(comodo)
 		} else {
