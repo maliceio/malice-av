@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -63,29 +64,29 @@ func RunCommand(cmd string, args ...string) string {
 func ParseComodoOutput(comodoout string) ResultsData {
 
 	comodo := ResultsData{Infected: false, Engine: "1.1", Updated: BuildTime}
+	// EXAMPLE OUTPUT:
 	// -----== Scan Start ==-----
 	// /malware/EICAR ---> Found Virus, Malware Name is Malware
 	// -----== Scan End ==-----
 	// Number of Scanned Files: 1
 	// Number of Found Viruses: 1
-
 	lines := strings.Split(comodoout, "\n")
-	fmt.Println(lines)
-	// Extract Virus string and extract colon separated lines into an slice
-	for _, line := range lines {
-		if len(line) != 0 {
-			if strings.Contains(line, "Found Virus") {
-				result := extractVirusName(line)
-				if len(result) != 0 {
-					comodo.Result = result
-					comodo.Infected = true
-				} else {
-					fmt.Println("[ERROR] Virus name extracted was empty: ", result)
-					os.Exit(2)
-				}
+
+	// Extract Virus string
+	// for _, line := range lines {
+	if len(lines[1]) != 0 {
+		if strings.Contains(lines[1], "Found Virus") {
+			result := extractVirusName(lines[1])
+			if len(result) != 0 {
+				comodo.Result = result
+				comodo.Infected = true
+				return comodo
 			}
+			fmt.Println("[ERROR] Virus name extracted was empty: ", result)
+			os.Exit(2)
 		}
 	}
+	// }
 
 	return comodo
 }
@@ -189,7 +190,8 @@ func main() {
 		},
 	}
 	app.Action = func(c *cli.Context) {
-		path := c.Args().First()
+		path, err := filepath.Abs(c.Args().First())
+		assert(err)
 
 		if _, err := os.Stat(path); os.IsNotExist(err) {
 			assert(err)

@@ -22,7 +22,7 @@ RUN buildDeps='ca-certificates \
   && DEBIAN_FRONTEND=noninteractive /opt/COMODO/post_setup.sh \
   && echo "Install Go..." \
   && ARCH="$(dpkg --print-architecture)" \
-  && wget https://storage.googleapis.com/golang/go$GO_VERSION.linux-$ARCH.tar.gz \
+  && wget -q --show-progress https://storage.googleapis.com/golang/go$GO_VERSION.linux-$ARCH.tar.gz \
   && tar -C /usr/local -xzf go$GO_VERSION.linux-$ARCH.tar.gz \
   && echo "Building malice-comodo Go binary..." \
   && cd /go/src/github.com/maliceio/malice-comodo \
@@ -30,14 +30,14 @@ RUN buildDeps='ca-certificates \
   && export GOPATH=/go \
   && go version \
   && go get \
-  && go build -ldflags "-X main.Version=$(cat VERSION) -X main.BuildTime=$(date -u +%Y%m%d)" -o /bin/scan
-  # && echo "Clean up unnecessary files..." \
-  # && apt-get purge -y --auto-remove $buildDeps \
-  # && apt-get clean \
-  # && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /go /usr/local/go
+  && go build -ldflags "-X main.Version=$(cat VERSION) -X main.BuildTime=$(date -u +%Y%m%d)" -o /bin/scan \
+  && echo "Clean up unnecessary files..." \
+  && apt-get purge -y --auto-remove $buildDeps \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /go /usr/local/go
 
 # Update Comodo definitions
-# ADD http://download.comodo.com/av/updates58/sigs/bases/bases.cav /opt/COMODO/scanners/bases.cav
+ADD http://download.comodo.com/av/updates58/sigs/bases/bases.cav /opt/COMODO/scanners/bases.cav
 
 # Add EICAR Test Virus File to malware folder
 ADD http://www.eicar.org/download/eicar.com.txt /malware/EICAR
