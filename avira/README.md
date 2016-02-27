@@ -1,4 +1,4 @@
-# malice-avira
+# malice-avira [DEAD]
 
 [![License](http://img.shields.io/:license-mit-blue.svg)](http://doge.mit-license.org)
 [![Docker Stars](https://img.shields.io/docker/stars/malice/avira.svg)][hub]
