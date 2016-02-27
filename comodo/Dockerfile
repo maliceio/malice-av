@@ -22,7 +22,7 @@ RUN buildDeps='ca-certificates \
   && DEBIAN_FRONTEND=noninteractive /opt/COMODO/post_setup.sh \
   && echo "Install Go..." \
   && ARCH="$(dpkg --print-architecture)" \
-  && wget -q --show-progress https://storage.googleapis.com/golang/go$GO_VERSION.linux-$ARCH.tar.gz \
+  && wget https://storage.googleapis.com/golang/go$GO_VERSION.linux-$ARCH.tar.gz \
   && tar -C /usr/local -xzf go$GO_VERSION.linux-$ARCH.tar.gz \
   && echo "Building malice-comodo Go binary..." \
   && cd /go/src/github.com/maliceio/malice-comodo \
