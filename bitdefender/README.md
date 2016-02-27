@@ -1,55 +1,102 @@
-Bitdefender Dockerfile
-================
+# malice-bitdefender
 
-This repository contains a **Dockerfile** of [Bitdefender](http://www.bitdefender.com/business/antivirus-for-unices.html) for [Docker](https://www.docker.io/)'s [trusted build](https://index.docker.io/u/blacktop/bitdefender/) published to the public [Docker Registry](https://index.docker.io/).
+[![License](http://img.shields.io/:license-mit-blue.svg)](http://doge.mit-license.org)
+[![Docker Stars](https://img.shields.io/docker/stars/malice/bitdefender.svg)][hub]
+[![Docker Pulls](https://img.shields.io/docker/pulls/malice/bitdefender.svg)][hub]
+[![Image Size](https://img.shields.io/imagelayers/image-size/malice/bitdefender/latest.svg)](https://imagelayers.io/?images=malice/bitdefender:latest)
+[![Image Layers](https://img.shields.io/imagelayers/layers/malice/bitdefender/latest.svg)](https://imagelayers.io/?images=malice/bitdefender:latest)
+
+This repository contains a **Dockerfile** of [Bitdefender](http://www.bitdefender.com/business/antivirus-for-unices.html) for [Docker](https://www.docker.io/)'s [trusted build][hub] published to the public [DockerHub](https://hub.docker.com).
 
 ### Dependencies
-* [ubuntu:latest](https://index.docker.io/_/ubuntu/)
+
+* [ubuntu:precise (*138 MB*)](https://hub.docker.com/_/ubuntu/)
 
 ### Installation
-1. Install [Docker](https://www.docker.io/).
-2. Download [trusted build](https://index.docker.io/u/blacktop/bitdefender/) from public [Docker Registry](https://index.docker.io/): `docker pull blacktop/bitdefender`
 
-#### Alternatively, build an image from Dockerfile
-`docker build -t blacktop/bitdefender github.com/blacktop/docker-bitdefender`
+1. Install [Docker](https://www.docker.io/).
+2. Download [trusted build][hub] from public [DockerHub](https://hub.docker.com): `docker pull malice/bitdefender`
 
 ### Usage
-```bash
-$ docker run -i -t blacktop/bitdefender
-```
+
+    docker run -it --rm malice/bitdefender EICAR
+
 #### Or link your own malware folder:
 ```bash
-$ docker run -i -t -v /path/to/malware/:/malware:ro blacktop/bitdefender
+$ docker run -it --rm -v /path/to/file/:/malware:ro malice/bitdefender
+
+Usage: bitdefender [OPTIONS] COMMAND [arg...]
+
+Malice Bitdefender AntiVirus Plugin
+
+Version: v0.1.0, BuildTime: 20160227
+
+Author:
+  blacktop - <https://github.com/blacktop>
+
+Options:
+  --table, -t	output as Markdown table
+  --post, -p	POST results to Malice webhook [$MALICE_ENDPOINT]
+  --proxy, -x	proxy settings for Malice webhook endpoint [$MALICE_PROXY]
+  --help, -h	show help
+  --version, -v	print the version
+
+Commands:
+  update	Update virus definitions
+  help		Shows a list of commands or help for one command
+
+Run 'bitdefender COMMAND --help' for more information on a command.
 ```
-#### Output:
+
+This will output to stdout and POST to malice results API webhook endpoint.
+
+### Sample Output JSON:
+```json
+{
+  "bitdefender": {
+    "infected": true,
+    "result": "Malware",
+    "engine": "1.1",
+    "updated": "20160227"
+  }
+}
+```
+### Sample Output STDOUT (Markdown Table):
+---
+#### Bitdefender
+| Infected | Result  | Engine | Updated  |
+| -------- | ------- | ------ | -------- |
+| true     | Malware | 1.1    | 20160227 |
+---
+### To Run on OSX
+ - Install [Homebrew](http://brew.sh)
+
 ```bash
-BitDefender Antivirus Scanner for Unices v7.90123 Linux-amd64
-Copyright (C) 1996-2009 BitDefender. All rights reserved.
-Trial key found. 30 days remaining.
-
-Infected file action: ignore
-Suspected file action: ignore
-Loading plugins, please wait
-Plugins loaded.
-
-/malware/EICAR  infected: 'EICAR-Test-File (not a virus)'
-
-
-Results:
-Folders: 0
-Files: 1
-Packed: 0
-Archives: 0
-Infected files: 1
-Suspect files: 0
-Warnings: 0
-Identified viruses: 1
-I/O errors: 0
+$ brew install caskroom/cask/brew-cask
+$ brew cask install virtualbox
+$ brew install docker
+$ brew install docker-machine
+$ docker-machine create --driver virtualbox malice
+$ eval $(docker-machine env malice)
 ```
 
-### Todo
-- [x] Install/Run Bitdefender
-- [ ] Start Daemon and watch folder with supervisord
-- [ ] Have container take a URL as input and download/scan file
-- [ ] Output Scan Results as formated JSON
-- [ ] Attach a Volume that will hold malware for a host's tmp folder
+### Documentation
+To update the AV run the following:
+```bash
+$ docker run --name=bitdefender malice/bitdefender update
+```
+Then to used the updated Bitdefender container:
+```bash
+$ docker restart bitdefender > /dev/null && docker exec bitdefender scan --table EICAR
+```
+
+### Issues
+
+Find a bug? Want more features? Find something missing in the documentation? Let me know! Please don't hesitate to [file an issue](https://github.com/maliceio/malice-av/issues/new) and I'll get right on it.
+
+### Credits
+
+### License
+MIT Copyright (c) 2016 **blacktop**
+
+[hub]: https://hub.docker.com/r/malice/bitdefender/
