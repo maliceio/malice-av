@@ -61,21 +61,40 @@ func RunCommand(cmd string, args ...string) string {
 func ParseAviraOutput(aviraout string) ResultsData {
 
 	avira := ResultsData{Infected: false}
-
+	// Avira AntiVir Professional (ondemand scanner)
+	// Copyright (C) 2010 by Avira GmbH.
+	// All rights reserved.
+	//
+	// SAVAPI-Version: 3.1.1.8, AVE-Version: 8.3.18.22
+	// VDF-Version: 7.11.151.18 created 20140523
+	//
+	// AntiVir license: 2228602884
+	//
+	// Info: automatically excluding /sys/ from scan (special fs)
+	// Info: automatically excluding /proc/ from scan (special fs)
+	// Info: automatically excluding /home/quarantine/ from scan (quarantine)
+	//
+	//   file: /malware/EICAR
+	//     last modified on  date: 2014-04-15  time: 07:29:59,  size: 68 bytes
+	//     "ALERT: Eicar-Test-Signature" ; virus ; Contains code of the Eicar-Test-Signature virus
+	//     ALERT-URL: http://www.avira.com/en/threats?q=Eicar%2DTest%2DSignature
+	//   no action taken
+	//
+	// ------ scan results ------
+	//    directories: 0
+	//  scanned files: 1
+	//         alerts: 1
+	//     suspicious: 0
+	//       repaired: 0
+	//        deleted: 0
+	//        renamed: 0
+	//          moved: 0
+	//      scan time: 00:00:01
+	// --------------------------
 	fmt.Println(aviraout)
 
 	return avira
 }
-
-// // extractVirusName extracts Virus name from scan results string
-// func extractVirusName(line string) string {
-// 	r := regexp.MustCompile(`<(.+)>`)
-// 	res := r.FindStringSubmatch(line)
-// 	if len(res) != 2 {
-// 		return ""
-// 	}
-// 	return res[1]
-// }
 
 func printStatus(resp gorequest.Response, body string, errs []error) {
 	fmt.Println(resp.Status)
@@ -145,6 +164,7 @@ func main() {
 		if _, err := os.Stat(path); os.IsNotExist(err) {
 			assert(err)
 		}
+		// Restart avguard
 		cmdOut, err := exec.Command("/usr/lib/AntiVir/guard/avguard", "restart > /dev/null 2>&1").Output()
 		if len(cmdOut) == 0 {
 			assert(err)
