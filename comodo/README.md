@@ -29,7 +29,7 @@ Usage: comodo [OPTIONS] COMMAND [arg...]
 
 Malice Comodo AntiVirus Plugin
 
-Version: v0.1.0, BuildTime: 20160214
+Version: v0.1.0, BuildTime: 20160227
 
 Author:
   blacktop - <https://github.com/blacktop>
@@ -55,18 +55,18 @@ This will output to stdout and POST to malice results API webhook endpoint.
 {
   "comodo": {
     "infected": true,
-    "result": "EICAR_Test_File (exact)",
-    "engine": "4.6.5.141",
-    "updated": "20160213"
+    "result": "Malware",
+    "engine": "1.1",
+    "updated": "20160227"
   }
 }
 ```
 ### Sample Output STDOUT (Markdown Table):
 ---
 #### Comodo
-| Infected | Result                  | Engine    | Updated    |
-| -------- | ----------------------- | --------- | ---------- |
-| true     | EICAR_Test_File (exact) | 4.6.5.141 | 20160213   |
+| Infected | Result  | Engine | Updated  |
+| -------- | ------- | ------ | -------- |
+| true     | Malware | 1.1    | 20160227 |
 ---
 ### To Run on OSX
  - Install [Homebrew](http://brew.sh)
