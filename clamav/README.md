@@ -20,11 +20,11 @@ This repository contains a **Dockerfile** of [ClamAV](http://www.clamav.net/lang
 
 ### Usage
 
-    docker run -it --rm malice/clamav EICAR
+    docker run --rm malice/clamav EICAR
 
 #### Or link your own malware folder:
 ```bash
-$ docker run -it --rm -v /path/to/file/:/malware:ro malice/clamav
+$ docker run --rm -v /path/to/file/:/malware:ro malice/clamav
 
 Usage: clamav [OPTIONS] COMMAND [arg...]
 

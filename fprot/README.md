@@ -19,11 +19,11 @@ This repository contains a **Dockerfile** of [fprot](http://www.fprot.net/lang/e
 
 ### Usage
 
-    docker run -it --rm malice/fprot EICAR
+    docker run --rm malice/fprot EICAR
 
 #### Or link your own malware folder:
 ```bash
-$ docker run -it --rm -v /path/to/file/:/malware:ro malice/fprot
+$ docker run --rm -v /path/to/file/:/malware:ro malice/fprot
 
 Usage: fprot [OPTIONS] COMMAND [arg...]
 

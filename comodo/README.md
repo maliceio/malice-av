@@ -19,11 +19,11 @@ This repository contains a **Dockerfile** of [Comodo](https://www.comodo.com/hom
 
 ### Usage
 
-    docker run -it --rm malice/comodo EICAR
+    docker run --rm malice/comodo EICAR
 
 #### Or link your own malware folder:
 ```bash
-$ docker run -it --rm -v /path/to/file/:/malware:ro malice/comodo
+$ docker run --rm -v /path/to/file/:/malware:ro malice/comodo
 
 Usage: comodo [OPTIONS] COMMAND [arg...]
 

@@ -19,11 +19,11 @@ This repository contains a **Dockerfile** of [avg](http://www.avg.net/lang/en/) 
 
 ### Usage
 
-    docker run -it --rm malice/avg EICAR
+    docker run --rm malice/avg EICAR
 
 #### Or link your own malware folder:
 ```bash
-$ docker run -it --rm -v /path/to/file/:/malware:ro malice/avg
+$ docker run --rm -v /path/to/file/:/malware:ro malice/avg
 
 Usage: avg [OPTIONS] COMMAND [arg...]
 

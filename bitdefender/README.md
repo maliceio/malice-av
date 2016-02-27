@@ -19,11 +19,11 @@ This repository contains a **Dockerfile** of [Bitdefender](http://www.bitdefende
 
 ### Usage
 
-    docker run -it --rm malice/bitdefender EICAR
+    docker run --rm malice/bitdefender EICAR
 
 #### Or link your own malware folder:
 ```bash
-$ docker run -it --rm -v /path/to/file/:/malware:ro malice/bitdefender
+$ docker run --rm -v /path/to/file/:/malware:ro malice/bitdefender
 
 Usage: bitdefender [OPTIONS] COMMAND [arg...]
 
@@ -55,8 +55,8 @@ This will output to stdout and POST to malice results API webhook endpoint.
 {
   "bitdefender": {
     "infected": true,
-    "result": "Malware",
-    "engine": "1.1",
+    "result": "EICAR-Test-File (not a virus)",
+    "engine": "7.90123",
     "updated": "20160227"
   }
 }
@@ -64,9 +64,9 @@ This will output to stdout and POST to malice results API webhook endpoint.
 ### Sample Output STDOUT (Markdown Table):
 ---
 #### Bitdefender
-| Infected | Result  | Engine | Updated  |
-| -------- | ------- | ------ | -------- |
-| true     | Malware | 1.1    | 20160227 |
+| Infected | Result                        | Engine  | Updated  |
+| -------- | ----------------------------- | ------- | -------- |
+| true     | EICAR-Test-File (not a virus) | 7.90123 | 20160227 |
 ---
 ### To Run on OSX
  - Install [Homebrew](http://brew.sh)
