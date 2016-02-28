@@ -15,9 +15,7 @@ RUN buildDeps='ca-certificates \
   && apt-get install -yq $buildDeps libc6-i386 --no-install-recommends \
   && set -x \
   && echo "Install F-PROT..." \
-  && curl -Ls http://files.f-prot.com/files/unix-trial/fp-Linux.x86.64-ws.tar.gz > /tmp/fprot.tar.gz \
-  && cd /tmp \
-  && tar -C /opt -zxvf fprot.tar.gz \
+  && tar -C /opt -zxvf /go/src/github.com/maliceio/malice-fprot/fp-Linux.x86.32-ws.tar.gz \
   && ln -fs /opt/f-prot/fpscan /usr/local/bin/fpscan \
   && ln -fs /opt/f-prot/fpscand /usr/local/sbin/fpscand \
   && ln -fs /opt/f-prot/fpmon /usr/local/sbin/fpmon \
@@ -45,7 +43,6 @@ RUN /opt/f-prot/fpupdate
 
 WORKDIR /malware
 
-# ENTRYPOINT ["/usr/local/bin/fpscan"]
 ENTRYPOINT ["/bin/scan"]
 
 CMD ["--help"]
