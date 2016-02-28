@@ -63,7 +63,7 @@ func RunCommand(cmd string, args ...string) string {
 // ParseBitdefenderOutput convert bitdefender output into ResultsData struct
 func ParseBitdefenderOutput(bitdefenderout string) ResultsData {
 
-	bitdefender := ResultsData{Infected: false, Updated: BuildTime}
+	bitdefender := ResultsData{Infected: false}
 	// EXAMPLE OUTPUT:
 	// BitDefender Antivirus Scanner for Unices v7.90123 Linux-amd64
 	// Copyright (C) 1996-2009 BitDefender. All rights reserved.
@@ -112,9 +112,9 @@ func ParseBitdefenderOutput(bitdefenderout string) ResultsData {
 			}
 		}
 	}
-	if found, updated := checkUpdatedDate(); found {
-		bitdefender.Updated = updated
-	}
+
+	bitdefender.Updated = getUpdatedDate()
+
 	return bitdefender
 }
 
@@ -128,14 +128,13 @@ func printStatus(resp gorequest.Response, body string, errs []error) {
 	fmt.Println(resp.Status)
 }
 
-func checkUpdatedDate() (bool, string) {
+func getUpdatedDate() string {
 	if _, err := os.Stat("/opt/malice/UPDATED"); os.IsNotExist(err) {
-		return false, ""
+		return BuildTime
 	}
 	updated, err := ioutil.ReadFile("/opt/malice/UPDATED")
 	assert(err)
-	return true, string(updated)
-
+	return string(updated)
 }
 
 func printMarkDownTable(bitdefender Bitdefender) {
@@ -155,6 +154,7 @@ func printMarkDownTable(bitdefender Bitdefender) {
 func updateAV() {
 	fmt.Println("Updating Bitdefender...")
 	fmt.Println(RunCommand("bdscan", "--update"))
+	// Update UPDATED file
 	t := time.Now().Format("20060102")
 	err := ioutil.WriteFile("/opt/malice/UPDATED", []byte(t), 0644)
 	assert(err)

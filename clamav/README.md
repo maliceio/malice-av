@@ -87,9 +87,11 @@ To update the AV run the following:
 ```bash
 $ docker run --name=clamav malice/clamav update
 ```
-Then to used the updated ClamAV container:
+Then to use the updated ClamAV container:
 ```bash
-$ docker restart clamav > /dev/null && docker exec clamav scan --table EICAR
+$ docker commit clamav malice/clamav
+$ docker rm clamav # clean up updated container
+$ docker run --rm malice/clamav EICAR
 ```
 
 ### Issues

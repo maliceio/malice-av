@@ -85,9 +85,11 @@ To update the AV run the following:
 ```bash
 $ docker run --name=bitdefender malice/bitdefender update
 ```
-Then to used the updated Bitdefender container:
+Then to use the updated Bitdefender container:
 ```bash
-$ docker restart bitdefender > /dev/null && docker exec bitdefender scan --table EICAR
+$ docker commit bitdefender malice/bitdefender
+$ docker rm bitdefender # clean up updated container
+$ docker run --rm malice/bitdefender EICAR
 ```
 
 ### Issues

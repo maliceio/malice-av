@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -133,6 +134,15 @@ func parseUpdatedDate(date string) string {
 	layout := "Mon, 02 Jan 2006 15:04:05 +0000"
 	t, _ := time.Parse(layout, date)
 	return fmt.Sprintf("%d%02d%02d", t.Year(), t.Month(), t.Day())
+}
+
+func getUpdatedDate() string {
+	if _, err := os.Stat("/opt/malice/UPDATED"); os.IsNotExist(err) {
+		return BuildTime
+	}
+	updated, err := ioutil.ReadFile("/opt/malice/UPDATED")
+	assert(err)
+	return string(updated)
 }
 
 func printStatus(resp gorequest.Response, body string, errs []error) {

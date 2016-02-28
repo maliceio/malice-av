@@ -86,9 +86,11 @@ To update the AV run the following:
 ```bash
 $ docker run --name=avg malice/avg update
 ```
-Then to used the updated AVG container:
+Then to use the updated AVG container:
 ```bash
-$ docker restart avg > /dev/null && docker exec avg scan --table EICAR
+$ docker commit avg malice/avg
+$ docker rm avg # clean up updated container
+$ docker run --rm malice/avg EICAR
 ```
 
 ### Issues

@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -63,7 +64,7 @@ func RunCommand(cmd string, args ...string) string {
 // ParseComodoOutput convert comodo output into ResultsData struct
 func ParseComodoOutput(comodoout string) ResultsData {
 
-	comodo := ResultsData{Infected: false, Engine: "1.1", Updated: BuildTime}
+	comodo := ResultsData{Infected: false, Engine: "1.1"}
 	// EXAMPLE OUTPUT:
 	// -----== Scan Start ==-----
 	// /malware/EICAR ---> Found Virus, Malware Name is Malware
@@ -87,6 +88,7 @@ func ParseComodoOutput(comodoout string) ResultsData {
 		}
 	}
 	// }
+	comodo.Updated = getUpdatedDate()
 
 	return comodo
 }
@@ -95,6 +97,15 @@ func ParseComodoOutput(comodoout string) ResultsData {
 func extractVirusName(line string) string {
 	keyvalue := strings.Split(line, "is")
 	return strings.TrimSpace(keyvalue[1])
+}
+
+func getUpdatedDate() string {
+	if _, err := os.Stat("/opt/malice/UPDATED"); os.IsNotExist(err) {
+		return BuildTime
+	}
+	updated, err := ioutil.ReadFile("/opt/malice/UPDATED")
+	assert(err)
+	return string(updated)
 }
 
 func printStatus(resp gorequest.Response, body string, errs []error) {
@@ -133,6 +144,10 @@ func updateAV() {
 	if err := response.DownloadToFile("/opt/COMODO/scanners/bases.cav"); err != nil {
 		log.Println("Unable to download file: ", err)
 	}
+	// Update UPDATED file
+	t := time.Now().Format("20060102")
+	err = ioutil.WriteFile("/opt/malice/UPDATED", []byte(t), 0644)
+	assert(err)
 }
 
 var appHelpTemplate = `Usage: {{.Name}} {{if .Flags}}[OPTIONS] {{end}}COMMAND [arg...]

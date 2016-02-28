@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -106,6 +107,8 @@ func ParseFprotOutput(fprotout string) ResultsData {
 		os.Exit(2)
 	}
 
+	// fprot.Updated = getUpdatedDate()
+
 	return fprot
 }
 
@@ -117,6 +120,15 @@ func extractVirusName(line string) string {
 		return ""
 	}
 	return res[1]
+}
+
+func getUpdatedDate() string {
+	if _, err := os.Stat("/opt/malice/UPDATED"); os.IsNotExist(err) {
+		return BuildTime
+	}
+	updated, err := ioutil.ReadFile("/opt/malice/UPDATED")
+	assert(err)
+	return string(updated)
 }
 
 func printStatus(resp gorequest.Response, body string, errs []error) {
@@ -146,6 +158,10 @@ func printMarkDownTable(fprot FPROT) {
 func updateAV() {
 	fmt.Println("Updating F-PROT...")
 	fmt.Println(RunCommand("/opt/f-prot/fpupdate"))
+	// Update UPDATED file
+	t := time.Now().Format("20060102")
+	err := ioutil.WriteFile("/opt/malice/UPDATED", []byte(t), 0644)
+	assert(err)
 }
 
 var appHelpTemplate = `Usage: {{.Name}} {{if .Flags}}[OPTIONS] {{end}}COMMAND [arg...]

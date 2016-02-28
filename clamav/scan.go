@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -94,9 +95,18 @@ func ParseClamAvOutput(clamout string) ResultsData {
 		}
 	}
 
-	clamAV.Updated = BuildTime
+	clamAV.Updated = getUpdatedDate()
 
 	return clamAV
+}
+
+func getUpdatedDate() string {
+	if _, err := os.Stat("/opt/malice/UPDATED"); os.IsNotExist(err) {
+		return BuildTime
+	}
+	updated, err := ioutil.ReadFile("/opt/malice/UPDATED")
+	assert(err)
+	return string(updated)
 }
 
 func printStatus(resp gorequest.Response, body string, errs []error) {
@@ -120,6 +130,10 @@ func printMarkDownTable(clamav ClamAV) {
 func updateAV() {
 	fmt.Println("Updating ClamAV...")
 	fmt.Println(RunCommand("freshclam"))
+	// Update UPDATED file
+	t := time.Now().Format("20060102")
+	err := ioutil.WriteFile("/opt/malice/UPDATED", []byte(t), 0644)
+	assert(err)
 }
 
 var appHelpTemplate = `Usage: {{.Name}} {{if .Flags}}[OPTIONS] {{end}}COMMAND [arg...]

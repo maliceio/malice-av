@@ -85,9 +85,11 @@ To update the AV run the following:
 ```bash
 $ docker run --name=fprot malice/fprot update
 ```
-Then to used the updated F-PROT container:
+Then to use the updated F-PROT container:
 ```bash
-$ docker restart fprot > /dev/null && docker exec fprot scan --table EICAR
+$ docker commit fprot malice/fprot
+$ docker rm fprot # clean up updated container
+$ docker run --rm malice/fprot EICAR
 ```
 
 ### Issues

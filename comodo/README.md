@@ -85,9 +85,11 @@ To update the AV run the following:
 ```bash
 $ docker run --name=comodo malice/comodo update
 ```
-Then to used the updated Comodo container:
+Then to use the updated Comodo container:
 ```bash
-$ docker restart comodo > /dev/null && docker exec comodo scan --table EICAR
+$ docker commit comodo malice/comodo
+$ docker rm comodo # clean up updated container
+$ docker run --rm malice/comodo EICAR
 ```
 
 ### Issues
