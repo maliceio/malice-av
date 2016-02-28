@@ -10,7 +10,7 @@ This repository contains a **Dockerfile** of [ClamAV](http://www.clamav.net/lang
 
 ### Dependencies
 
-* [gliderlabs/alpine:3.3](https://index.docker.io/_/gliderlabs/alpine/)
+* [gliderlabs/alpine](https://index.docker.io/_/gliderlabs/alpine/)
 
 
 ### Installation
