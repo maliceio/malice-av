@@ -89,9 +89,9 @@ $ docker run --name=clamav malice/clamav update
 ```
 Then to use the updated ClamAV container:
 ```bash
-$ docker commit clamav malice/clamav
+$ docker commit clamav malice/clamav:updated
 $ docker rm clamav # clean up updated container
-$ docker run --rm malice/clamav EICAR
+$ docker run --rm malice/clamav:updated EICAR
 ```
 
 ### Issues

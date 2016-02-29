@@ -87,9 +87,9 @@ $ docker run --name=comodo malice/comodo update
 ```
 Then to use the updated Comodo container:
 ```bash
-$ docker commit comodo malice/comodo
+$ docker commit comodo malice/comodo:updated
 $ docker rm comodo # clean up updated container
-$ docker run --rm malice/comodo EICAR
+$ docker run --rm malice/comodo:updated EICAR
 ```
 
 ### Issues
