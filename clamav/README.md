@@ -24,7 +24,7 @@ This repository contains a **Dockerfile** of [ClamAV](http://www.clamav.net/lang
 
 #### Or link your own malware folder:
 ```bash
-$ docker run --rm -v /path/to/file/:/malware:ro malice/clamav
+$ docker run --rm -v /path/to/malware:/malware:ro malice/clamav FILE
 
 Usage: clamav [OPTIONS] COMMAND [arg...]
 

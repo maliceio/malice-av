@@ -23,7 +23,7 @@ This repository contains a **Dockerfile** of [Comodo](https://www.comodo.com/hom
 
 #### Or link your own malware folder:
 ```bash
-$ docker run --rm -v /path/to/file/:/malware:ro malice/comodo
+$ docker run --rm -v /path/to/malware:/malware:ro malice/comodo FILE
 
 Usage: comodo [OPTIONS] COMMAND [arg...]
 

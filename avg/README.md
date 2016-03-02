@@ -23,7 +23,7 @@ This repository contains a **Dockerfile** of [avg](http://www.avg.net/lang/en/) 
 
 #### Or link your own malware folder:
 ```bash
-$ docker run --rm -v /path/to/file/:/malware:ro malice/avg
+$ docker run --rm -v /path/to/malware:/malware:ro malice/avg FILE
 
 Usage: avg [OPTIONS] COMMAND [arg...]
 

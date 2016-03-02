@@ -23,7 +23,7 @@ This repository contains a **Dockerfile** of [fprot](http://www.fprot.net/lang/e
 
 #### Or link your own malware folder:
 ```bash
-$ docker run --rm -v /path/to/file/:/malware:ro malice/fprot
+$ docker run --rm -v /path/to/malware:/malware:ro malice/fprot FILE
 
 Usage: fprot [OPTIONS] COMMAND [arg...]
 

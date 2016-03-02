@@ -23,7 +23,7 @@ This repository contains a **Dockerfile** of [Bitdefender](http://www.bitdefende
 
 #### Or link your own malware folder:
 ```bash
-$ docker run --rm -v /path/to/file/:/malware:ro malice/bitdefender
+$ docker run --rm -v /path/to/malware:/malware:ro malice/bitdefender FILE
 
 Usage: bitdefender [OPTIONS] COMMAND [arg...]
 
