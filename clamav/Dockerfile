@@ -6,9 +6,7 @@ COPY . /go/src/github.com/maliceio/malice-clamav
 RUN apk-install clamav freshclam
 RUN apk-install -t build-deps go git mercurial \
   && set -x \
-  && mv /etc/clamav/freshclam.conf.sample /etc/clamav/freshclam.conf \
-  && mv /etc/clamav/clamd.conf.sample /etc/clamav/clamd.conf \
-  && echo "Building info Go binary..." \
+  && echo "Building scan Go binary..." \
   && cd /go/src/github.com/maliceio/malice-clamav \
   && export GOPATH=/go \
   && go version \
