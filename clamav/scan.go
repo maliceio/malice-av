@@ -10,9 +10,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/codegangsta/cli"
 	"github.com/crackcomm/go-clitable"
 	"github.com/parnurzeal/gorequest"
+	"github.com/urfave/cli"
 )
 
 // Version stores the plugin's version
@@ -127,13 +127,13 @@ func printMarkDownTable(clamav ClamAV) {
 	table.Print()
 }
 
-func updateAV() {
+func updateAV() error {
 	fmt.Println("Updating ClamAV...")
 	fmt.Println(RunCommand("freshclam"))
 	// Update UPDATED file
 	t := time.Now().Format("20060102")
 	err := ioutil.WriteFile("/opt/malice/UPDATED", []byte(t), 0644)
-	assert(err)
+	return err
 }
 
 var appHelpTemplate = `Usage: {{.Name}} {{if .Flags}}[OPTIONS] {{end}}COMMAND [arg...]
@@ -185,12 +185,12 @@ func main() {
 			Name:    "update",
 			Aliases: []string{"u"},
 			Usage:   "Update virus definitions",
-			Action: func(c *cli.Context) {
-				updateAV()
+			Action: func(c *cli.Context) error {
+				return updateAV()
 			},
 		},
 	}
-	app.Action = func(c *cli.Context) {
+	app.Action = func(c *cli.Context) error {
 		path := c.Args().First()
 
 		if _, err := os.Stat(path); os.IsNotExist(err) {
@@ -218,6 +218,7 @@ func main() {
 			}
 			fmt.Println(string(fprotJSON))
 		}
+		return nil
 	}
 
 	err := app.Run(os.Args)
