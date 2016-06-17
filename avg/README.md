@@ -1,27 +1,27 @@
-# malice-avg
+malice-avg
+==========
 
-[![License](http://img.shields.io/:license-mit-blue.svg)](http://doge.mit-license.org)
-[![Docker Stars](https://img.shields.io/docker/stars/malice/avg.svg)][hub]
-[![Docker Pulls](https://img.shields.io/docker/pulls/malice/avg.svg)][hub]
-[![Image Size](https://img.shields.io/imagelayers/image-size/malice/avg/latest.svg)](https://imagelayers.io/?images=malice/avg:latest)
-[![Image Layers](https://img.shields.io/imagelayers/layers/malice/avg/latest.svg)](https://imagelayers.io/?images=malice/avg:latest)
+[![License](http://img.shields.io/:license-mit-blue.svg)](http://doge.mit-license.org)[![Docker Stars](https://img.shields.io/docker/stars/malice/avg.svg)](https://hub.docker.com/r/malice/avg/)[![Docker Pulls](https://img.shields.io/docker/pulls/malice/avg.svg)](https://hub.docker.com/r/malice/avg/)
 
 This repository contains a **Dockerfile** of [avg](http://www.avg.net/lang/en/) for [Docker](https://www.docker.io/)'s [trusted build](https://index.docker.io/u/malice/avg/) published to the public [DockerHub](https://index.docker.io/).
 
 ### Dependencies
 
-* [debian:jessie (*125 MB*)](https://index.docker.io/_/debian/)
+-	[debian:jessie (*125 MB*\)](https://index.docker.io/_/debian/)
 
 ### Installation
 
-1. Install [Docker](https://www.docker.io/).
-2. Download [trusted build](https://hub.docker.com/r/malice/avg/) from public [DockerHub](https://hub.docker.com): `docker pull malice/avg`
+1.	Install [Docker](https://www.docker.io/).
+2.	Download [trusted build](https://hub.docker.com/r/malice/avg/) from public [DockerHub](https://hub.docker.com): `docker pull malice/avg`
 
 ### Usage
 
-    docker run --rm malice/avg EICAR
+```
+docker run --rm malice/avg EICAR
+```
 
 #### Or link your own malware folder:
+
 ```bash
 $ docker run --rm -v /path/to/malware:/malware:ro malice/avg FILE
 
@@ -51,6 +51,7 @@ Run 'avg COMMAND --help' for more information on a command.
 This will output to stdout and POST to malice results API webhook endpoint.
 
 ### Sample Output JSON:
+
 ```json
 {
   "avg": {
@@ -62,15 +63,22 @@ This will output to stdout and POST to malice results API webhook endpoint.
   }
 }
 ```
+
 ### Sample Output STDOUT (Markdown Table):
+
 ---
+
 #### AVG
+
 | Infected | Result                      | Engine    | Updated  |
-| -------- | --------------------------- | --------- | -------- |
+|----------|-----------------------------|-----------|----------|
 | true     | Virus identified EICAR_Test | 13.0.3114 | 20160213 |
+
 ---
+
 ### To Run on OSX
- - Install [Homebrew](http://brew.sh)
+
+-	Install [Homebrew](http://brew.sh)
 
 ```bash
 $ brew install caskroom/cask/brew-cask
@@ -82,11 +90,15 @@ $ eval $(docker-machine env malice)
 ```
 
 ### Documentation
+
 To update the AV run the following:
+
 ```bash
 $ docker run --name=avg malice/avg update
 ```
+
 Then to use the updated AVG container:
+
 ```bash
 $ docker commit avg malice/avg:updated
 $ docker rm avg # clean up updated container
@@ -100,6 +112,5 @@ Find a bug? Want more features? Find something missing in the documentation? Let
 ### Credits
 
 ### License
-MIT Copyright (c) 2016 **blacktop**
 
-[hub]: https://hub.docker.com/r/malice/avg/
+MIT Copyright (c) 2016 **blacktop**

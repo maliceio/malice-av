@@ -1,27 +1,27 @@
-# malice-fprot
+malice-fprot
+============
 
-[![License](http://img.shields.io/:license-mit-blue.svg)](http://doge.mit-license.org)
-[![Docker Stars](https://img.shields.io/docker/stars/malice/fprot.svg)][hub]
-[![Docker Pulls](https://img.shields.io/docker/pulls/malice/fprot.svg)][hub]
-[![Image Size](https://img.shields.io/imagelayers/image-size/malice/fprot/latest.svg)](https://imagelayers.io/?images=malice/fprot:latest)
-[![Image Layers](https://img.shields.io/imagelayers/layers/malice/fprot/latest.svg)](https://imagelayers.io/?images=malice/fprot:latest)
+[![License](http://img.shields.io/:license-mit-blue.svg)](http://doge.mit-license.org)[![Docker Stars](https://img.shields.io/docker/stars/malice/fprot.svg)](https://hub.docker.com/r/malice/fprot/)[![Docker Pulls](https://img.shields.io/docker/pulls/malice/fprot.svg)](https://hub.docker.com/r/malice/fprot/)
 
 This repository contains a **Dockerfile** of [fprot](http://www.fprot.net/lang/en/) for [Docker](https://www.docker.io/)'s [trusted build](https://index.docker.io/u/malice/fprot/) published to the public [DockerHub](https://index.docker.io/).
 
 ### Dependencies
 
-* [debian:jessie (*125 MB*)](https://index.docker.io/_/debian/)
+-	[debian:jessie (*125 MB*\)](https://index.docker.io/_/debian/)
 
 ### Installation
 
-1. Install [Docker](https://www.docker.io/).
-2. Download [trusted build](https://hub.docker.com/r/malice/fprot/) from public [DockerHub](https://hub.docker.com): `docker pull malice/fprot`
+1.	Install [Docker](https://www.docker.io/).
+2.	Download [trusted build](https://hub.docker.com/r/malice/fprot/) from public [DockerHub](https://hub.docker.com): `docker pull malice/fprot`
 
 ### Usage
 
-    docker run --rm malice/fprot EICAR
+```
+docker run --rm malice/fprot EICAR
+```
 
 #### Or link your own malware folder:
+
 ```bash
 $ docker run --rm -v /path/to/malware:/malware:ro malice/fprot FILE
 
@@ -51,6 +51,7 @@ Run 'fprot COMMAND --help' for more information on a command.
 This will output to stdout and POST to malice results API webhook endpoint.
 
 ### Sample Output JSON:
+
 ```json
 {
   "f-prot": {
@@ -61,15 +62,22 @@ This will output to stdout and POST to malice results API webhook endpoint.
   }
 }
 ```
+
 ### Sample Output STDOUT (Markdown Table):
+
 ---
+
 #### F-PROT
-| Infected | Result                  | Engine    | Updated    |
-| -------- | ----------------------- | --------- | ---------- |
-| true     | EICAR_Test_File (exact) | 4.6.5.141 | 20160213   |
+
+| Infected | Result                  | Engine    | Updated  |
+|----------|-------------------------|-----------|----------|
+| true     | EICAR_Test_File (exact) | 4.6.5.141 | 20160213 |
+
 ---
+
 ### To Run on OSX
- - Install [Homebrew](http://brew.sh)
+
+-	Install [Homebrew](http://brew.sh)
 
 ```bash
 $ brew install caskroom/cask/brew-cask
@@ -81,11 +89,15 @@ $ eval $(docker-machine env malice)
 ```
 
 ### Documentation
+
 To update the AV run the following:
+
 ```bash
 $ docker run --name=fprot malice/fprot update
 ```
+
 Then to use the updated F-PROT container:
+
 ```bash
 $ docker commit fprot malice/fprot:updated
 $ docker rm fprot # clean up updated container
@@ -99,6 +111,5 @@ Find a bug? Want more features? Find something missing in the documentation? Let
 ### Credits
 
 ### License
-MIT Copyright (c) 2016 **blacktop**
 
-[hub]: https://hub.docker.com/r/malice/fprot/
+MIT Copyright (c) 2016 **blacktop**

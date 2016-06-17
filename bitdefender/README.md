@@ -1,27 +1,27 @@
-# malice-bitdefender
+malice-bitdefender
+==================
 
-[![License](http://img.shields.io/:license-mit-blue.svg)](http://doge.mit-license.org)
-[![Docker Stars](https://img.shields.io/docker/stars/malice/bitdefender.svg)][hub]
-[![Docker Pulls](https://img.shields.io/docker/pulls/malice/bitdefender.svg)][hub]
-[![Image Size](https://img.shields.io/imagelayers/image-size/malice/bitdefender/latest.svg)](https://imagelayers.io/?images=malice/bitdefender:latest)
-[![Image Layers](https://img.shields.io/imagelayers/layers/malice/bitdefender/latest.svg)](https://imagelayers.io/?images=malice/bitdefender:latest)
+[![License](http://img.shields.io/:license-mit-blue.svg)](http://doge.mit-license.org)[![Docker Stars](https://img.shields.io/docker/stars/malice/bitdefender.svg)](https://hub.docker.com/r/malice/bitdefender/)[![Docker Pulls](https://img.shields.io/docker/pulls/malice/bitdefender.svg)](https://hub.docker.com/r/malice/bitdefender/)
 
-This repository contains a **Dockerfile** of [Bitdefender](http://www.bitdefender.com/business/antivirus-for-unices.html) for [Docker](https://www.docker.io/)'s [trusted build][hub] published to the public [DockerHub](https://hub.docker.com).
+This repository contains a **Dockerfile** of [Bitdefender](http://www.bitdefender.com/business/antivirus-for-unices.html) for [Docker](https://www.docker.io/)'s [trusted build](https://hub.docker.com/r/malice/bitdefender/) published to the public [DockerHub](https://hub.docker.com).
 
 ### Dependencies
 
-* [ubuntu:precise (*138 MB*)](https://hub.docker.com/_/ubuntu/)
+-	[ubuntu:precise (*138 MB*\)](https://hub.docker.com/_/ubuntu/)
 
 ### Installation
 
-1. Install [Docker](https://www.docker.io/).
-2. Download [trusted build][hub] from public [DockerHub](https://hub.docker.com): `docker pull malice/bitdefender`
+1.	Install [Docker](https://www.docker.io/).
+2.	Download [trusted build](https://hub.docker.com/r/malice/bitdefender/) from public [DockerHub](https://hub.docker.com): `docker pull malice/bitdefender`
 
 ### Usage
 
-    docker run --rm malice/bitdefender EICAR
+```
+docker run --rm malice/bitdefender EICAR
+```
 
 #### Or link your own malware folder:
+
 ```bash
 $ docker run --rm -v /path/to/malware:/malware:ro malice/bitdefender FILE
 
@@ -51,6 +51,7 @@ Run 'bitdefender COMMAND --help' for more information on a command.
 This will output to stdout and POST to malice results API webhook endpoint.
 
 ### Sample Output JSON:
+
 ```json
 {
   "bitdefender": {
@@ -61,15 +62,22 @@ This will output to stdout and POST to malice results API webhook endpoint.
   }
 }
 ```
+
 ### Sample Output STDOUT (Markdown Table):
+
 ---
+
 #### Bitdefender
+
 | Infected | Result                        | Engine  | Updated  |
-| -------- | ----------------------------- | ------- | -------- |
+|----------|-------------------------------|---------|----------|
 | true     | EICAR-Test-File (not a virus) | 7.90123 | 20160227 |
+
 ---
+
 ### To Run on OSX
- - Install [Homebrew](http://brew.sh)
+
+-	Install [Homebrew](http://brew.sh)
 
 ```bash
 $ brew install caskroom/cask/brew-cask
@@ -81,11 +89,15 @@ $ eval $(docker-machine env malice)
 ```
 
 ### Documentation
+
 To update the AV run the following:
+
 ```bash
 $ docker run --name=bitdefender malice/bitdefender update
 ```
+
 Then to use the updated Bitdefender container:
+
 ```bash
 $ docker commit bitdefender malice/bitdefender:updated
 $ docker rm bitdefender # clean up updated container
@@ -99,6 +111,5 @@ Find a bug? Want more features? Find something missing in the documentation? Let
 ### Credits
 
 ### License
-MIT Copyright (c) 2016 **blacktop**
 
-[hub]: https://hub.docker.com/r/malice/bitdefender/
+MIT Copyright (c) 2016 **blacktop**

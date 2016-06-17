@@ -1,28 +1,27 @@
-# malice-clamav
+malice-clamav
+=============
 
-[![License](http://img.shields.io/:license-mit-blue.svg)](http://doge.mit-license.org)
-[![Docker Stars](https://img.shields.io/docker/stars/malice/clamav.svg)][hub]
-[![Docker Pulls](https://img.shields.io/docker/pulls/malice/clamav.svg)][hub]
-[![Image Size](https://img.shields.io/imagelayers/image-size/malice/clamav/latest.svg)](https://imagelayers.io/?images=malice/clamav:latest)
-[![Image Layers](https://img.shields.io/imagelayers/layers/malice/clamav/latest.svg)](https://imagelayers.io/?images=malice/clamav:latest)
+[![License](http://img.shields.io/:license-mit-blue.svg)](http://doge.mit-license.org)[![Docker Stars](https://img.shields.io/docker/stars/malice/clamav.svg)](https://hub.docker.com/r/malice/clamav/)[![Docker Pulls](https://img.shields.io/docker/pulls/malice/clamav.svg)](https://hub.docker.com/r/malice/clamav/)
 
 This repository contains a **Dockerfile** of [ClamAV](http://www.clamav.net/lang/en/) for [Docker](https://www.docker.io/)'s [trusted build](https://index.docker.io/u/malice/clamav/) published to the public [DockerHub](https://index.docker.io/).
 
 ### Dependencies
 
-* [gliderlabs/alpine](https://index.docker.io/_/gliderlabs/alpine/)
-
+-	[gliderlabs/alpine](https://index.docker.io/_/gliderlabs/alpine/)
 
 ### Installation
 
-1. Install [Docker](https://www.docker.io/).
-2. Download [trusted build](https://hub.docker.com/r/malice/clamav/) from public [DockerHub](https://hub.docker.com): `docker pull malice/clamav`
+1.	Install [Docker](https://www.docker.io/).
+2.	Download [trusted build](https://hub.docker.com/r/malice/clamav/) from public [DockerHub](https://hub.docker.com): `docker pull malice/clamav`
 
 ### Usage
 
-    docker run --rm malice/clamav EICAR
+```
+docker run --rm malice/clamav EICAR
+```
 
 #### Or link your own malware folder:
+
 ```bash
 $ docker run --rm -v /path/to/malware:/malware:ro malice/clamav FILE
 
@@ -52,6 +51,7 @@ Run 'clamav COMMAND --help' for more information on a command.
 This will output to stdout and POST to malice results API webhook endpoint.
 
 ### Sample Output JSON:
+
 ```json
 {
   "clamav": {
@@ -63,15 +63,22 @@ This will output to stdout and POST to malice results API webhook endpoint.
   }
 }
 ```
+
 ### Sample Output STDOUT (Markdown Table):
+
 ---
+
 #### ClamAV
+
 | Infected | Result               | Engine | Updated  |
-| -------- | -------------------- | ------ | -------- |
+|----------|----------------------|--------|----------|
 | true     | Eicar-Test-Signature | 0.99   | 20160213 |
+
 ---
+
 ### To Run on OSX
- - Install [Homebrew](http://brew.sh)
+
+-	Install [Homebrew](http://brew.sh)
 
 ```bash
 $ brew install caskroom/cask/brew-cask
@@ -83,11 +90,15 @@ $ eval $(docker-machine env malice)
 ```
 
 ### Documentation
+
 To update the AV run the following:
+
 ```bash
 $ docker run --name=clamav malice/clamav update
 ```
+
 Then to use the updated ClamAV container:
+
 ```bash
 $ docker commit clamav malice/clamav:updated
 $ docker rm clamav # clean up updated container
@@ -101,6 +112,5 @@ Find a bug? Want more features? Find something missing in the documentation? Let
 ### Credits
 
 ### License
-MIT Copyright (c) 2016 **blacktop**
 
-[hub]: https://hub.docker.com/r/malice/clamav/
+MIT Copyright (c) 2016 **blacktop**

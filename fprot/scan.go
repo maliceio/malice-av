@@ -11,9 +11,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/codegangsta/cli"
 	"github.com/crackcomm/go-clitable"
 	"github.com/parnurzeal/gorequest"
+	"github.com/urfave/cli"
 )
 
 // Version stores the plugin's version

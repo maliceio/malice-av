@@ -1,29 +1,29 @@
-# malice-avira [DEAD]
+malice-avira [DEAD]
+===================
 
-[![License](http://img.shields.io/:license-mit-blue.svg)](http://doge.mit-license.org)
-[![Docker Stars](https://img.shields.io/docker/stars/malice/avira.svg)][hub]
-[![Docker Pulls](https://img.shields.io/docker/pulls/malice/avira.svg)][hub]
-[![Image Size](https://img.shields.io/imagelayers/image-size/malice/avira/latest.svg)](https://imagelayers.io/?images=malice/avira:latest)
-[![Image Layers](https://img.shields.io/imagelayers/layers/malice/avira/latest.svg)](https://imagelayers.io/?images=malice/avira:latest)
+[![License](http://img.shields.io/:license-mit-blue.svg)](http://doge.mit-license.org)[![Docker Stars](https://img.shields.io/docker/stars/malice/avira.svg)](https://hub.docker.com/r/malice/avira/)[![Docker Pulls](https://img.shields.io/docker/pulls/malice/avira.svg)](https://hub.docker.com/r/malice/avira/)
 
-This repository contains a **Dockerfile** of [Avira](http://www.avira.com/en/index) for [Docker](https://www.docker.io/)'s [trusted build][hub] published to the public [DockerHub](https://hub.docker.com).
+This repository contains a **Dockerfile** of [Avira](http://www.avira.com/en/index) for [Docker](https://www.docker.io/)'s [trusted build](https://hub.docker.com/r/malice/avira/) published to the public [DockerHub](https://hub.docker.com).
 
 > The license expired at 2014-03-01. (Appears that FREE avira is dead) :cry:
 
 ### Dependencies
 
-* [ubuntu:precise (*138 MB*)](https://hub.docker.com/_/ubuntu/)
+-	[ubuntu:precise (*138 MB*\)](https://hub.docker.com/_/ubuntu/)
 
 ### Installation
 
-1. Install [Docker](https://www.docker.io/).
-2. Download [trusted build][hub] from public [DockerHub](https://hub.docker.com): `docker pull malice/avira`
+1.	Install [Docker](https://www.docker.io/).
+2.	Download [trusted build](https://hub.docker.com/r/malice/avira/) from public [DockerHub](https://hub.docker.com): `docker pull malice/avira`
 
 ### Usage
 
-    docker run --rm malice/avira EICAR
+```
+docker run --rm malice/avira EICAR
+```
 
 #### Or link your own malware folder:
+
 ```bash
 $ docker run --rm -v /path/to/file/:/malware:ro malice/avira
 
@@ -53,6 +53,7 @@ Run 'avira COMMAND --help' for more information on a command.
 This will output to stdout and POST to malice results API webhook endpoint.
 
 ### Sample Output JSON:
+
 ```json
 {
   "avira": {
@@ -63,15 +64,22 @@ This will output to stdout and POST to malice results API webhook endpoint.
   }
 }
 ```
+
 ### Sample Output STDOUT (Markdown Table):
+
 ---
+
 #### Avira
+
 | Infected | Result                        | Engine  | Updated  |
-| -------- | ----------------------------- | ------- | -------- |
+|----------|-------------------------------|---------|----------|
 | true     | EICAR-Test-File (not a virus) | 7.90123 | 20160227 |
+
 ---
+
 ### To Run on OSX
- - Install [Homebrew](http://brew.sh)
+
+-	Install [Homebrew](http://brew.sh)
 
 ```bash
 $ brew install caskroom/cask/brew-cask
@@ -83,11 +91,15 @@ $ eval $(docker-machine env malice)
 ```
 
 ### Documentation
+
 To update the AV run the following:
+
 ```bash
 $ docker run --name=avira malice/avira update
 ```
+
 Then to used the updated Avira container:
+
 ```bash
 $ docker restart avira > /dev/null && docker exec avira scan --table EICAR
 ```
@@ -99,10 +111,8 @@ Find a bug? Want more features? Find something missing in the documentation? Let
 ### Credits
 
 ### License
+
 MIT Copyright (c) 2016 **blacktop**
-
-[hub]: https://hub.docker.com/r/malice/avira/
-
 
 <!-- Avira Dockerfile
 ================

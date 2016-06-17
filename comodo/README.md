@@ -1,27 +1,27 @@
-# malice-comodo
+malice-comodo
+=============
 
-[![License](http://img.shields.io/:license-mit-blue.svg)](http://doge.mit-license.org)
-[![Docker Stars](https://img.shields.io/docker/stars/malice/comodo.svg)][hub]
-[![Docker Pulls](https://img.shields.io/docker/pulls/malice/comodo.svg)][hub]
-[![Image Size](https://img.shields.io/imagelayers/image-size/malice/comodo/latest.svg)](https://imagelayers.io/?images=malice/comodo:latest)
-[![Image Layers](https://img.shields.io/imagelayers/layers/malice/comodo/latest.svg)](https://imagelayers.io/?images=malice/comodo:latest)
+[![License](http://img.shields.io/:license-mit-blue.svg)](http://doge.mit-license.org)[![Docker Stars](https://img.shields.io/docker/stars/malice/comodo.svg)](https://hub.docker.com/r/malice/comodo/)[![Docker Pulls](https://img.shields.io/docker/pulls/malice/comodo.svg)](https://hub.docker.com/r/malice/comodo/)
 
-This repository contains a **Dockerfile** of [Comodo](https://www.comodo.com/home/internet-security/antivirus-for-linux.php) for [Docker](https://www.docker.io/)'s [trusted build][hub] published to the public [DockerHub](https://hub.docker.com).
+This repository contains a **Dockerfile** of [Comodo](https://www.comodo.com/home/internet-security/antivirus-for-linux.php) for [Docker](https://www.docker.io/)'s [trusted build](https://hub.docker.com/r/malice/comodo/) published to the public [DockerHub](https://hub.docker.com).
 
 ### Dependencies
 
-* [ubuntu:precise (*138 MB*)](https://hub.docker.com/_/ubuntu/)
+-	[ubuntu:precise (*138 MB*\)](https://hub.docker.com/_/ubuntu/)
 
 ### Installation
 
-1. Install [Docker](https://www.docker.io/).
-2. Download [trusted build][hub] from public [DockerHub](https://hub.docker.com): `docker pull malice/comodo`
+1.	Install [Docker](https://www.docker.io/).
+2.	Download [trusted build](https://hub.docker.com/r/malice/comodo/) from public [DockerHub](https://hub.docker.com): `docker pull malice/comodo`
 
 ### Usage
 
-    docker run --rm malice/comodo EICAR
+```
+docker run --rm malice/comodo EICAR
+```
 
 #### Or link your own malware folder:
+
 ```bash
 $ docker run --rm -v /path/to/malware:/malware:ro malice/comodo FILE
 
@@ -51,6 +51,7 @@ Run 'comodo COMMAND --help' for more information on a command.
 This will output to stdout and POST to malice results API webhook endpoint.
 
 ### Sample Output JSON:
+
 ```json
 {
   "comodo": {
@@ -61,15 +62,22 @@ This will output to stdout and POST to malice results API webhook endpoint.
   }
 }
 ```
+
 ### Sample Output STDOUT (Markdown Table):
+
 ---
+
 #### Comodo
+
 | Infected | Result  | Engine | Updated  |
-| -------- | ------- | ------ | -------- |
+|----------|---------|--------|----------|
 | true     | Malware | 1.1    | 20160227 |
+
 ---
+
 ### To Run on OSX
- - Install [Homebrew](http://brew.sh)
+
+-	Install [Homebrew](http://brew.sh)
 
 ```bash
 $ brew install caskroom/cask/brew-cask
@@ -81,11 +89,15 @@ $ eval $(docker-machine env malice)
 ```
 
 ### Documentation
+
 To update the AV run the following:
+
 ```bash
 $ docker run --name=comodo malice/comodo update
 ```
+
 Then to use the updated Comodo container:
+
 ```bash
 $ docker commit comodo malice/comodo:updated
 $ docker rm comodo # clean up updated container
@@ -99,6 +111,5 @@ Find a bug? Want more features? Find something missing in the documentation? Let
 ### Credits
 
 ### License
-MIT Copyright (c) 2016 **blacktop**
 
-[hub]: https://hub.docker.com/r/malice/comodo/
+MIT Copyright (c) 2016 **blacktop**
