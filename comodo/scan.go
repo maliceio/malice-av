@@ -132,10 +132,12 @@ func printMarkDownTable(comodo Comodo) {
 	table.Print()
 }
 
-func updateAV() {
+func updateAV() error {
 	fmt.Println("Updating Comodo...")
 	response, err := grequests.Get("http://download.comodo.com/av/updates58/sigs/bases/bases.cav", nil)
-	assert(err)
+	if err != nil {
+		return err
+	}
 
 	if response.Ok != true {
 		log.Println("Request did not return OK")
@@ -147,7 +149,7 @@ func updateAV() {
 	// Update UPDATED file
 	t := time.Now().Format("20060102")
 	err = ioutil.WriteFile("/opt/malice/UPDATED", []byte(t), 0644)
-	assert(err)
+	return err
 }
 
 var appHelpTemplate = `Usage: {{.Name}} {{if .Flags}}[OPTIONS] {{end}}COMMAND [arg...]
@@ -199,12 +201,12 @@ func main() {
 			Name:    "update",
 			Aliases: []string{"u"},
 			Usage:   "Update virus definitions",
-			Action: func(c *cli.Context) {
-				updateAV()
+			Action: func(c *cli.Context) error {
+				return updateAV()
 			},
 		},
 	}
-	app.Action = func(c *cli.Context) {
+	app.Action = func(c *cli.Context) error {
 		path, err := filepath.Abs(c.Args().First())
 		assert(err)
 
@@ -233,6 +235,7 @@ func main() {
 			}
 			fmt.Println(string(comodoJSON))
 		}
+		return nil
 	}
 
 	err := app.Run(os.Args)
