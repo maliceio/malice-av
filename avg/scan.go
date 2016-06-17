@@ -2,13 +2,15 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"os/exec"
 	"strings"
 	"time"
+
+	log "github.com/Sirupsen/logrus"
 
 	"github.com/crackcomm/go-clitable"
 	"github.com/parnurzeal/gorequest"
@@ -61,7 +63,7 @@ func RunCommand(cmd string, args ...string) string {
 }
 
 // ParseAVGOutput convert avg output into ResultsData struct
-func ParseAVGOutput(avgout string, path string) ResultsData {
+func ParseAVGOutput(avgout string, path string) (ResultsData, error) {
 
 	avg := ResultsData{
 		Infected: false,
@@ -105,12 +107,14 @@ func ParseAVGOutput(avgout string, path string) ResultsData {
 			}
 		}
 	} else {
-		fmt.Println("[ERROR] colonSeparated was empty: ", colonSeparated)
-		fmt.Printf("[ERROR] AVG output was: \n%s", avgout)
-		os.Exit(2)
+		log.Error("[ERROR] colonSeparated was empty: ", colonSeparated)
+		log.Errorf("[ERROR] AVG output was: \n%s", avgout)
+		// fmt.Println("[ERROR] colonSeparated was empty: ", colonSeparated)
+		// fmt.Printf("[ERROR] AVG output was: \n%s", avgout)
+		return ResultsData{}, errors.New("Unable to parse AVG output.")
 	}
 
-	return avg
+	return avg, nil
 }
 
 // Get Anti-Virus scanner version
@@ -238,9 +242,20 @@ func main() {
 
 		// AVG needs to have the daemon started first
 		exec.Command("/etc/init.d/avgd", "start").Output()
+		// Give avgd a few to finish
+		time.Sleep(time.Second * 2)
+
+		var results ResultsData
+
+		results, err := ParseAVGOutput(RunCommand("/usr/bin/avgscan", path), path)
+		if err != nil {
+			// If fails try a second time
+			results, err = ParseAVGOutput(RunCommand("/usr/bin/avgscan", path), path)
+			assert(err)
+		}
 
 		avg := AVG{
-			Results: ParseAVGOutput(RunCommand("/usr/bin/avgscan", path), path),
+			Results: results,
 		}
 
 		if c.Bool("table") {
