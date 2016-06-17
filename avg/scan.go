@@ -10,9 +10,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/codegangsta/cli"
 	"github.com/crackcomm/go-clitable"
 	"github.com/parnurzeal/gorequest"
+	"github.com/urfave/cli"
 )
 
 // Version stores the plugin's version
@@ -149,12 +149,16 @@ func printStatus(resp gorequest.Response, body string, errs []error) {
 	fmt.Println(resp.Status)
 }
 
-func updateAV() {
+func updateAV() error {
 	fmt.Println("Updating AVG...")
 	// AVG needs to have the daemon started first
 	exec.Command("/etc/init.d/avgd", "start").Output()
 
 	fmt.Println(RunCommand("avgupdate"))
+	// Update UPDATED file
+	t := time.Now().Format("20060102")
+	err := ioutil.WriteFile("/opt/malice/UPDATED", []byte(t), 0644)
+	return err
 }
 
 func printMarkDownTable(avg AVG) {
@@ -220,12 +224,12 @@ func main() {
 			Name:    "update",
 			Aliases: []string{"u"},
 			Usage:   "Update virus definitions",
-			Action: func(c *cli.Context) {
-				updateAV()
+			Action: func(c *cli.Context) error {
+				return updateAV()
 			},
 		},
 	}
-	app.Action = func(c *cli.Context) {
+	app.Action = func(c *cli.Context) error {
 		path := c.Args().First()
 
 		if _, err := os.Stat(path); os.IsNotExist(err) {
@@ -256,6 +260,7 @@ func main() {
 			}
 			fmt.Println(string(avgJSON))
 		}
+		return nil
 	}
 
 	err := app.Run(os.Args)
