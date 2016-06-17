@@ -11,10 +11,8 @@ RUN buildDeps='ca-certificates \
                git-core \
                unzip \
                curl' \
-  && set -x \
   && apt-get update -qq \
   && apt-get install -yq $buildDeps libc6-i386 --no-install-recommends \
-  && set -x \
   && echo "Install AVG..." \
   && curl -Ls http://download.avgfree.com/filedir/inst/avg2013flx-r3118-a6926.i386.deb > /tmp/avg.deb \
   && dpkg -i /tmp/avg.deb \
