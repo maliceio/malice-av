@@ -1,7 +1,7 @@
 malice-avira [DEAD]
 ===================
 
-[![License](http://img.shields.io/:license-mit-blue.svg)](http://doge.mit-license.org)[![Docker Stars](https://img.shields.io/docker/stars/malice/avira.svg)](https://hub.docker.com/r/malice/avira/)[![Docker Pulls](https://img.shields.io/docker/pulls/malice/avira.svg)](https://hub.docker.com/r/malice/avira/)
+[![License](http://img.shields.io/:license-mit-blue.svg)](http://doge.mit-license.org) [![Docker Stars](https://img.shields.io/docker/stars/malice/avira.svg)](https://hub.docker.com/r/malice/avira/) [![Docker Pulls](https://img.shields.io/docker/pulls/malice/avira.svg)](https://hub.docker.com/r/malice/avira/)
 
 This repository contains a **Dockerfile** of [Avira](http://www.avira.com/en/index) for [Docker](https://www.docker.io/)'s [trusted build](https://hub.docker.com/r/malice/avira/) published to the public [DockerHub](https://hub.docker.com).
 

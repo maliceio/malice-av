@@ -1,7 +1,7 @@
 malice-comodo
 =============
 
-[![License](http://img.shields.io/:license-mit-blue.svg)](http://doge.mit-license.org)[![Docker Stars](https://img.shields.io/docker/stars/malice/comodo.svg)](https://hub.docker.com/r/malice/comodo/)[![Docker Pulls](https://img.shields.io/docker/pulls/malice/comodo.svg)](https://hub.docker.com/r/malice/comodo/)
+[![License](http://img.shields.io/:license-mit-blue.svg)](http://doge.mit-license.org) [![Docker Stars](https://img.shields.io/docker/stars/malice/comodo.svg)](https://hub.docker.com/r/malice/comodo/) [![Docker Pulls](https://img.shields.io/docker/pulls/malice/comodo.svg)](https://hub.docker.com/r/malice/comodo/)
 
 This repository contains a **Dockerfile** of [Comodo](https://www.comodo.com/home/internet-security/antivirus-for-linux.php) for [Docker](https://www.docker.io/)'s [trusted build](https://hub.docker.com/r/malice/comodo/) published to the public [DockerHub](https://hub.docker.com).
 
