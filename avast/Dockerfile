@@ -17,9 +17,7 @@ COPY . /go/src/github.com/maliceio/malice-avast
 RUN buildDeps='build-essential \
                golang-go \
                mercurial \
-               git-core \
-               unzip \
-               curl' \
+               git-core' \
     && apt-get update -qq \
     && apt-get install -yq $buildDeps --no-install-recommends \    
     && echo "Building avast malscan Go binary..." \
