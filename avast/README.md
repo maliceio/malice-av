@@ -56,7 +56,7 @@ This will output to stdout and POST to malice results API webhook endpoint.
 {
   "avast": {
     "infected": true,
-    "result": "EICAR",
+    "result": "EICAR Test-NOT virus!!!",
     "engine": "2.1.2",
     "database": "16061703",
     "updated": "20160618"
@@ -68,11 +68,10 @@ This will output to stdout and POST to malice results API webhook endpoint.
 
 ---
 
-#### avast
-
-| Infected | Result                      | Engine    | Updated  |
-|----------|-----------------------------|-----------|----------|
-| true     | Virus identified EICAR_Test | 13.0.3114 | 20160213 |
+#### Avast
+| Infected | Result                  | Engine | Updated  |
+| -------- | ----------------------- | ------ | -------- |
+| true     | EICAR Test-NOT virus!!! | 2.1.2  | 20160618 |
 
 ---
 
