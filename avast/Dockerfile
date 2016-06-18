@@ -1,33 +1,44 @@
-FROM ubuntu:latest
+FROM debian:jessie
 MAINTAINER blacktop, https://github.com/blacktop
 
-#Prevent daemon start during install
-RUN echo '#!/bin/sh\nexit 101' > /usr/sbin/policy-rc.d && \
-    chmod +x /usr/sbin/policy-rc.d
+# Install Avast AV
+COPY license.avastlic /etc/avast/license.avastlic
+COPY avast.gpg /avast.gpg
+RUN \
+    echo "Install Avast..." \
+    && echo 'deb http://deb.avast.com/lin/repo debian release' >> /etc/apt/sources.list \
+    && apt-key add /avast.gpg \
+    && apt-get update -q && apt-get install -y avast
 
-# Install Requirements
-RUN apt-get update -qq && apt-get install -qqy libc6-i386 supervisor wget
+# Install Go binary    
+COPY . /go/src/github.com/maliceio/malice-avast
+RUN buildDeps='ca-certificates \
+               build-essential \
+               golang-go \
+               mercurial \
+               git-core \
+               unzip \
+               curl' \
+    && apt-get update -qq \
+    && apt-get install -yq $buildDeps --no-install-recommends \    
+    && echo "Building avast malscan Go binary..." \
+    && cd /go/src/github.com/maliceio/malice-avast \
+    && export GOPATH=/go \
+    && go version \
+    && go get \
+    && go build -ldflags "-X main.Version $(cat VERSION) -X main.BuildTime $(date -u +%Y%m%d)" -o /bin/malscan
+    # && echo "Clean up unnecessary files..." \
+    # && apt-get purge -y --auto-remove $buildDeps \
+    # && apt-get clean \
+    # && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /go
 
-# Add EICAR Test Virus File to malware folder
-ADD http://www.eicar.org/download/eicar.com.txt /malware/EICAR
-
-# Get Avast Installer
-ADD http://files.avast.com/files/linux/avast4workstation_1.3.0-2_i386.deb /avast/
-
-# Install Avast
-RUN dpkg -i /avast/avast4workstation_1.3.0-2_i386.deb
-
-# Start Avast Service and Update Avast Definitions
-ADD avastrc .avast/avastrc
-
-RUN sysctl -w kernel.shmmax=128000000
-RUN /usr/bin/avast && /usr/bin/avast-update
-
-# Try to reduce size of container.
-RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+COPY eicar.com.txt /malware/EICAR
 
 WORKDIR /malware
 
-ENTRYPOINT ["/usr/bin/avast"]
+ENTRYPOINT ["/bin/malscan"]
 
 CMD ["--help"]
+
+# NOTE: https://www.avast.com/en-us/faq.php?article=AVKB131
+# NOTE: To Update run - /var/lib/avast/Setup/avast.vpsupdate
