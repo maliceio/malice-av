@@ -14,8 +14,7 @@ RUN \
 
 # Install Go binary    
 COPY . /go/src/github.com/maliceio/malice-avast
-RUN buildDeps='ca-certificates \
-               build-essential \
+RUN buildDeps='build-essential \
                golang-go \
                mercurial \
                git-core \
