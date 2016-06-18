@@ -111,6 +111,7 @@ Find a bug? Want more features? Find something missing in the documentation? Let
 ### Credits
 
 ### TODO
+ - [ ] Add Docs for how to add your own Avast License
  - [ ] Add URL scanning
 
 ### License
