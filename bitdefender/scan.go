@@ -1,19 +1,21 @@
 package main
 
 import (
+	"crypto/sha256"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/crackcomm/go-clitable"
 	"github.com/parnurzeal/gorequest"
 	"github.com/urfave/cli"
+	r "gopkg.in/dancannon/gorethink.v2"
 )
 
 // Version stores the plugin's version
@@ -21,6 +23,16 @@ var Version string
 
 // BuildTime stores the plugin's build time
 var BuildTime string
+
+const (
+	name     = "bitdefender"
+	category = "av"
+)
+
+type pluginResults struct {
+	ID   string      `json:"id" gorethink:"id,omitempty"`
+	Data ResultsData `json:"bitdefender" gorethink:"bitdefender"`
+}
 
 // Bitdefender json object
 type Bitdefender struct {
@@ -47,6 +59,19 @@ func assert(err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+// getSHA256 calculates a file's sha256sum
+func getSHA256(name string) string {
+
+	dat, err := ioutil.ReadFile(name)
+	assert(err)
+
+	h256 := sha256.New()
+	_, err = h256.Write(dat)
+	assert(err)
+
+	return fmt.Sprintf("%x", h256.Sum(nil))
 }
 
 // RunCommand runs cmd on file
@@ -160,6 +185,47 @@ func updateAV() error {
 	return err
 }
 
+// writeToDatabase upserts plugin results into Database
+func writeToDatabase(results pluginResults) {
+
+	address := fmt.Sprintf("%s:28015", getopt("MALICE_RETHINKDB", "rethink"))
+
+	// connect to RethinkDB
+	session, err := r.Connect(r.ConnectOpts{
+		Address:  address,
+		Timeout:  5 * time.Second,
+		Database: "malice",
+	})
+	defer session.Close()
+
+	if err == nil {
+		res, err := r.Table("samples").Get(results.ID).Run(session)
+		assert(err)
+		defer res.Close()
+
+		if res.IsNil() {
+			// upsert into RethinkDB
+			resp, err := r.Table("samples").Insert(results, r.InsertOpts{Conflict: "replace"}).RunWrite(session)
+			assert(err)
+			log.Debug(resp)
+		} else {
+			resp, err := r.Table("samples").Get(results.ID).Update(map[string]interface{}{
+				"plugins": map[string]interface{}{
+					category: map[string]interface{}{
+						name: results.Data,
+					},
+				},
+			}).RunWrite(session)
+			assert(err)
+
+			log.Debug(resp)
+		}
+
+	} else {
+		log.Debug(err)
+	}
+}
+
 var appHelpTemplate = `Usage: {{.Name}} {{if .Flags}}[OPTIONS] {{end}}COMMAND [arg...]
 
 {{.Usage}}
@@ -188,7 +254,12 @@ func main() {
 	app.Version = Version + ", BuildTime: " + BuildTime
 	app.Compiled, _ = time.Parse("20060102", BuildTime)
 	app.Usage = "Malice Bitdefender AntiVirus Plugin"
+	var rethinkdb string
 	app.Flags = []cli.Flag{
+		cli.BoolFlag{
+			Name:  "verbose, V",
+			Usage: "verbose output",
+		},
 		cli.BoolFlag{
 			Name:  "table, t",
 			Usage: "output as Markdown table",
@@ -202,6 +273,13 @@ func main() {
 			Name:   "proxy, x",
 			Usage:  "proxy settings for Malice webhook endpoint",
 			EnvVar: "MALICE_PROXY",
+		},
+		cli.StringFlag{
+			Name:        "rethinkdb",
+			Value:       "",
+			Usage:       "rethinkdb address for Malice to store results",
+			EnvVar:      "MALICE_RETHINKDB",
+			Destination: &rethinkdb,
 		},
 	}
 	app.Commands = []cli.Command{
@@ -221,10 +299,15 @@ func main() {
 		if _, err := os.Stat(path); os.IsNotExist(err) {
 			assert(err)
 		}
-
+		if c.Bool("verbose") {
+			log.SetLevel(log.DebugLevel)
+		}
 		bitdefender := Bitdefender{
 			Results: ParseBitdefenderOutput(RunCommand("bdscan", path)),
 		}
+
+		// upsert into Database
+		writeToDatabase(pluginResults{ID: getSHA256(path), Data: bitdefender.Results})
 
 		if c.Bool("table") {
 			printMarkDownTable(bitdefender)
