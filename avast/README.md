@@ -35,16 +35,18 @@ Author:
   blacktop - <https://github.com/blacktop>
 
 Options:
-  --table, -t    output as Markdown table
-  --post, -p     POST results to Malice webhook [$MALICE_ENDPOINT]
-  --proxy, -x    proxy settings for Malice webhook endpoint [$MALICE_PROXY]
-  --help, -h     show help
-  --version, -v  print the version
-
+  --verbose, -V         verbose output
+  --table, -t           output as Markdown table
+  --post, -p            POST results to Malice webhook [$MALICE_ENDPOINT]
+  --proxy, -x           proxy settings for Malice webhook endpoint [$MALICE_PROXY]
+  --rethinkdb value     rethinkdb address for Malice to store results [$MALICE_RETHINKDB]
+  --help, -h            show help
+  --version, -v         print the version
+ 
 Commands:
-  update  Update virus definitions
-  help    Shows a list of commands or help for one command
-
+  update        Update virus definitions
+  help          Shows a list of commands or help for one command
+ 
 Run 'avast COMMAND --help' for more information on a command.
 ```
 
@@ -74,6 +76,14 @@ This will output to stdout and POST to malice results API webhook endpoint.
 | true     | EICAR Test-NOT virus!!! | 2.1.2  | 20160618 |
 
 ---
+
+### To write results to [RethinkDB](https://rethinkdb.com)
+
+```bash
+$ docker volume create --name malice
+$ docker run -d -p 28015:28015 -p 8080:8080 -v malice:/data --name rethink rethinkdb
+$ docker run --rm -v /path/to/malware:/malware:ro --link rethink:rethink malice/avast -t FILE
+```
 
 ### To Run on OSX
 
