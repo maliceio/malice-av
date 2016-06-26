@@ -42,10 +42,10 @@ type Comodo struct {
 
 // ResultsData json object
 type ResultsData struct {
-	Infected bool   `json:"infected"`
-	Result   string `json:"result"`
-	Engine   string `json:"engine"`
-	Updated  string `json:"updated"`
+	Infected bool   `json:"infected" gorethink:"infected"`
+	Result   string `json:"result" gorethink:"result"`
+	Engine   string `json:"engine" gorethink:"engine"`
+	Updated  string `json:"updated" gorethink:"updated"`
 }
 
 func getopt(name, dfault string) string {

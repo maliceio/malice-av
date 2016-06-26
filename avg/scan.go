@@ -30,11 +30,11 @@ type AVG struct {
 
 // ResultsData json object
 type ResultsData struct {
-	Infected bool   `json:"infected"`
-	Result   string `json:"result"`
-	Engine   string `json:"engine"`
-	Database string `json:"database"`
-	Updated  string `json:"updated"`
+	Infected bool   `json:"infected" gorethink:"infected"`
+	Result   string `json:"result" gorethink:"result"`
+	Engine   string `json:"engine" gorethink:"engine"`
+	Database string `json:"database" gorethink:"database"`
+	Updated  string `json:"updated" gorethink:"updated"`
 }
 
 func getopt(name, dfault string) string {
