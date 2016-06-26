@@ -3,7 +3,7 @@ FROM gliderlabs/alpine
 MAINTAINER blacktop, https://github.com/blacktop
 
 COPY . /go/src/github.com/maliceio/malice-clamav
-RUN apk-install clamav freshclam
+RUN apk-install clamav freshclam ca-certificates
 RUN apk-install -t build-deps go git mercurial \
   && set -x \
   && echo "Building scan Go binary..." \
