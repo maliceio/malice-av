@@ -293,13 +293,19 @@ func main() {
 		}
 		if c.Bool("verbose") {
 			log.SetLevel(log.DebugLevel)
+		} else {
+			r.Log.Out = ioutil.Discard
 		}
+
 		comodo := Comodo{
 			Results: ParseComodoOutput(RunCommand("/opt/COMODO/cmdscan", "-vs", path)),
 		}
 
 		// upsert into Database
-		writeToDatabase(pluginResults{ID: getSHA256(path), Data: comodo.Results})
+		writeToDatabase(pluginResults{
+			ID:   getopt("MALICE_SCANID", getSHA256(path)),
+			Data: comodo.Results,
+		})
 
 		if c.Bool("table") {
 			printMarkDownTable(comodo)

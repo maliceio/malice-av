@@ -276,7 +276,10 @@ func main() {
 		}
 		if c.Bool("verbose") {
 			log.SetLevel(log.DebugLevel)
+		} else {
+			r.Log.Out = ioutil.Discard
 		}
+
 		// Avast needs to have the daemon started first
 		exec.Command("/etc/init.d/avast", "start").Output()
 		// Give avast service a few to finish
@@ -292,7 +295,10 @@ func main() {
 		}
 
 		// upsert into Database
-		writeToDatabase(pluginResults{ID: getSHA256(path), Data: results})
+		writeToDatabase(pluginResults{
+			ID:   getopt("MALICE_SCANID", getSHA256(path)),
+			Data: results,
+		})
 
 		avast := Avast{
 			Results: results,

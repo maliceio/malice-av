@@ -11,10 +11,10 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
-
 	"github.com/crackcomm/go-clitable"
 	"github.com/parnurzeal/gorequest"
 	"github.com/urfave/cli"
+	r "gopkg.in/dancannon/gorethink.v2"
 )
 
 // Version stores the plugin's version
@@ -22,6 +22,16 @@ var Version string
 
 // BuildTime stores the plugin's build time
 var BuildTime string
+
+const (
+	name     = "avg"
+	category = "av"
+)
+
+type pluginResults struct {
+	ID   string      `json:"id" gorethink:"id,omitempty"`
+	Data ResultsData `json:"avast" gorethink:"avg"`
+}
 
 // AVG json object
 type AVG struct {
@@ -177,6 +187,47 @@ func printMarkDownTable(avg AVG) {
 	})
 	table.Markdown = true
 	table.Print()
+}
+
+// writeToDatabase upserts plugin results into Database
+func writeToDatabase(results pluginResults) {
+
+	address := fmt.Sprintf("%s:28015", getopt("MALICE_RETHINKDB", "rethink"))
+
+	// connect to RethinkDB
+	session, err := r.Connect(r.ConnectOpts{
+		Address:  address,
+		Timeout:  5 * time.Second,
+		Database: "malice",
+	})
+	defer session.Close()
+
+	if err == nil {
+		res, err := r.Table("samples").Get(results.ID).Run(session)
+		assert(err)
+		defer res.Close()
+
+		if res.IsNil() {
+			// upsert into RethinkDB
+			resp, err := r.Table("samples").Insert(results, r.InsertOpts{Conflict: "replace"}).RunWrite(session)
+			assert(err)
+			log.Debug(resp)
+		} else {
+			resp, err := r.Table("samples").Get(results.ID).Update(map[string]interface{}{
+				"plugins": map[string]interface{}{
+					category: map[string]interface{}{
+						name: results.Data,
+					},
+				},
+			}).RunWrite(session)
+			assert(err)
+
+			log.Debug(resp)
+		}
+
+	} else {
+		log.Debug(err)
+	}
 }
 
 var appHelpTemplate = `Usage: {{.Name}} {{if .Flags}}[OPTIONS] {{end}}COMMAND [arg...]

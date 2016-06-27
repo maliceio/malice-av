@@ -304,13 +304,19 @@ func main() {
 		}
 		if c.Bool("verbose") {
 			log.SetLevel(log.DebugLevel)
+		} else {
+			r.Log.Out = ioutil.Discard
 		}
+
 		fprot := FPROT{
 			Results: ParseFprotOutput(RunCommand("/usr/local/bin/fpscan", "-r", path)),
 		}
 
 		// upsert into Database
-		writeToDatabase(pluginResults{ID: getSHA256(path), Data: fprot.Results})
+		writeToDatabase(pluginResults{
+			ID:   getopt("MALICE_SCANID", getSHA256(path)),
+			Data: fprot.Results,
+		})
 
 		if c.Bool("table") {
 			printMarkDownTable(fprot)

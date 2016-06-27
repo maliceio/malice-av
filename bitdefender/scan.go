@@ -301,13 +301,19 @@ func main() {
 		}
 		if c.Bool("verbose") {
 			log.SetLevel(log.DebugLevel)
+		} else {
+			r.Log.Out = ioutil.Discard
 		}
+
 		bitdefender := Bitdefender{
 			Results: ParseBitdefenderOutput(RunCommand("bdscan", path)),
 		}
 
 		// upsert into Database
-		writeToDatabase(pluginResults{ID: getSHA256(path), Data: bitdefender.Results})
+		writeToDatabase(pluginResults{
+			ID:   getopt("MALICE_SCANID", getSHA256(path)),
+			Data: bitdefender.Results,
+		})
 
 		if c.Bool("table") {
 			printMarkDownTable(bitdefender)

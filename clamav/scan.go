@@ -277,6 +277,8 @@ func main() {
 
 		if c.Bool("verbose") {
 			log.SetLevel(log.DebugLevel)
+		} else {
+			r.Log.Out = ioutil.Discard
 		}
 
 		clamav := ClamAV{
@@ -284,7 +286,10 @@ func main() {
 		}
 
 		// upsert into Database
-		writeToDatabase(pluginResults{ID: getSHA256(path), Data: clamav.Results})
+		writeToDatabase(pluginResults{
+			ID:   getopt("MALICE_SCANID", getSHA256(path)),
+			Data: clamav.Results,
+		})
 
 		if c.Bool("table") {
 			printMarkDownTable(clamav)
