@@ -258,7 +258,19 @@ func main() {
 	app.Version = Version + ", BuildTime: " + BuildTime
 	app.Compiled, _ = time.Parse("20060102", BuildTime)
 	app.Usage = "Malice AVG AntiVirus Plugin"
+	var rethinkdb string
 	app.Flags = []cli.Flag{
+		cli.BoolFlag{
+			Name:  "verbose, V",
+			Usage: "verbose output",
+		},
+		cli.StringFlag{
+			Name:        "rethinkdb",
+			Value:       "",
+			Usage:       "rethinkdb address for Malice to store results",
+			EnvVar:      "MALICE_RETHINKDB",
+			Destination: &rethinkdb,
+		},
 		cli.BoolFlag{
 			Name:  "table, t",
 			Usage: "output as Markdown table",
@@ -289,6 +301,12 @@ func main() {
 
 		if _, err := os.Stat(path); os.IsNotExist(err) {
 			assert(err)
+		}
+
+		if c.Bool("verbose") {
+			log.SetLevel(log.DebugLevel)
+		} else {
+			r.Log.Out = ioutil.Discard
 		}
 
 		// AVG needs to have the daemon started first

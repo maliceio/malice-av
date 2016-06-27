@@ -236,6 +236,13 @@ func main() {
 			Name:  "verbose, V",
 			Usage: "verbose output",
 		},
+		cli.StringFlag{
+			Name:        "rethinkdb",
+			Value:       "",
+			Usage:       "rethinkdb address for Malice to store results",
+			EnvVar:      "MALICE_RETHINKDB",
+			Destination: &rethinkdb,
+		},
 		cli.BoolFlag{
 			Name:  "table, t",
 			Usage: "output as Markdown table",
@@ -249,13 +256,6 @@ func main() {
 			Name:   "proxy, x",
 			Usage:  "proxy settings for Malice webhook endpoint",
 			EnvVar: "MALICE_PROXY",
-		},
-		cli.StringFlag{
-			Name:        "rethinkdb",
-			Value:       "",
-			Usage:       "rethinkdb address for Malice to store results",
-			EnvVar:      "MALICE_RETHINKDB",
-			Destination: &rethinkdb,
 		},
 	}
 	app.Commands = []cli.Command{
