@@ -17,3 +17,5 @@ ADD http://www.eicar.org/download/eicar.com.txt /malware/EICAR
 
 # Try to reduce size of container.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# http://www.microworldsystems.com/download/linux/soho/deb/escan-antivirus-wks-7.0-18.amd64.deb

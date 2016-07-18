@@ -180,41 +180,38 @@ func updateAV() error {
 // writeToDatabase upserts plugin results into Database
 func writeToDatabase(results pluginResults) {
 
-	address := fmt.Sprintf("%s:28015", getopt("MALICE_RETHINKDB", "rethink"))
-
 	// connect to RethinkDB
 	session, err := r.Connect(r.ConnectOpts{
-		Address:  address,
+		Address:  fmt.Sprintf("%s:28015", getopt("MALICE_RETHINKDB", "rethink")),
 		Timeout:  5 * time.Second,
 		Database: "malice",
 	})
+	if err != nil {
+		log.Debug(err)
+		return
+	}
 	defer session.Close()
 
-	if err == nil {
-		res, err := r.Table("samples").Get(results.ID).Run(session)
+	res, err := r.Table("samples").Get(results.ID).Run(session)
+	assert(err)
+	defer res.Close()
+
+	if res.IsNil() {
+		// upsert into RethinkDB
+		resp, err := r.Table("samples").Insert(results, r.InsertOpts{Conflict: "replace"}).RunWrite(session)
 		assert(err)
-		defer res.Close()
-
-		if res.IsNil() {
-			// upsert into RethinkDB
-			resp, err := r.Table("samples").Insert(results, r.InsertOpts{Conflict: "replace"}).RunWrite(session)
-			assert(err)
-			log.Debug(resp)
-		} else {
-			resp, err := r.Table("samples").Get(results.ID).Update(map[string]interface{}{
-				"plugins": map[string]interface{}{
-					category: map[string]interface{}{
-						name: results.Data,
-					},
-				},
-			}).RunWrite(session)
-			assert(err)
-
-			log.Debug(resp)
-		}
-
+		log.Debug(resp)
 	} else {
-		log.Debug(err)
+		resp, err := r.Table("samples").Get(results.ID).Update(map[string]interface{}{
+			"plugins": map[string]interface{}{
+				category: map[string]interface{}{
+					name: results.Data,
+				},
+			},
+		}).RunWrite(session)
+		assert(err)
+
+		log.Debug(resp)
 	}
 }
 
