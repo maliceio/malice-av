@@ -1,5 +1,5 @@
 malice-avast
-==========
+============
 
 [![License](http://img.shields.io/:license-mit-blue.svg)](http://doge.mit-license.org) [![Docker Stars](https://img.shields.io/docker/stars/malice/avast.svg)](https://hub.docker.com/r/malice/avast/) [![Docker Pulls](https://img.shields.io/docker/pulls/malice/avast.svg)](https://hub.docker.com/r/malice/avast/)
 
@@ -42,11 +42,11 @@ Options:
   --rethinkdb value     rethinkdb address for Malice to store results [$MALICE_RETHINKDB]
   --help, -h            show help
   --version, -v         print the version
- 
+
 Commands:
   update        Update virus definitions
   help          Shows a list of commands or help for one command
- 
+
 Run 'avast COMMAND --help' for more information on a command.
 ```
 
@@ -114,6 +114,22 @@ $ docker rm avast # clean up updated container
 $ docker run --rm malice/avast:updated EICAR
 ```
 
+To add your own license and update
+
+ - Download one from [here](https://www.avast.com/en-us/registration-free-antivirus.php)
+
+```bash
+$ docker run --name=avast -v /path/to/license:/etc/avast/license.avastlic malice/avast update
+```
+
+Then to use the license/updated avast container:
+
+```bash
+$ docker commit avast malice/avast:updated
+$ docker rm avast # clean up updated container
+$ docker run --rm malice/avast:updated EICAR
+```
+
 ### Issues
 
 Find a bug? Want more features? Find something missing in the documentation? Let me know! Please don't hesitate to [file an issue](https://github.com/maliceio/malice-av/issues/new) and I'll get right on it.
@@ -121,7 +137,7 @@ Find a bug? Want more features? Find something missing in the documentation? Let
 ### Credits
 
 ### TODO
- - [ ] Add Docs for how to add your own Avast License
+ - [x] Add Docs for how to add your own Avast License
  - [ ] Add URL scanning
 
 ### License
