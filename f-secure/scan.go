@@ -245,10 +245,10 @@ func main() {
 
 		var results ResultsData
 
-		results, err := ParseAvastOutput(utils.RunCommand("scan", "-abfu", path), path)
+		results, err := ParseAvastOutput(utils.RunCommand("fsav", "--virus-action=none", path), path)
 		if err != nil {
 			// If fails try a second time
-			results, err = ParseAvastOutput(utils.RunCommand("scan", "-abfu", path), path)
+			results, err = ParseAvastOutput(utils.RunCommand("fsav", "--virus-action=none", path), path)
 			utils.Assert(err)
 		}
 
