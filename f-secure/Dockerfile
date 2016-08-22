@@ -14,13 +14,11 @@ RUN buildDeps='ca-certificates lib32stdc++6 wget rpm' \
   && tar zxvf fsls-${FSECURE_VERSION}.tar.gz \
   && cd fsls-${FSECURE_VERSION} \
   && chmod a+x fsls-${FSECURE_VERSION} \
-  && ./fsls-${FSECURE_VERSION} --auto lang=en --command-line-only \
+  && ./fsls-${FSECURE_VERSION} --auto standalone lang=en --command-line-only \
   && echo "Clean up unnecessary files..." \
   && apt-get purge -y --auto-remove $buildDeps \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /go
-
-# RUN printf "f\nw\n\n" | /opt/f-secure/fsav/sbin/fschooser
 
 # Install Go binary
 COPY . /go/src/github.com/maliceio/malice-fsecure
@@ -43,10 +41,12 @@ RUN buildDeps='ca-certificates \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /go
 
 # Update F-Secure
+# COPY fsdbupdate9.run /opt/f-secure
 RUN set -x \
   && /etc/init.d/fsaua start \
   && /etc/init.d/fsupdated start \
-  &&
+  && /opt/f-secure/fsav/bin/dbupdate
+
 # Add EICAR Test Virus File to malware folder
 ADD http://www.eicar.org/download/eicar.com.txt /malware/EICAR
 

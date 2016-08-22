@@ -24,18 +24,18 @@ var Version string
 var BuildTime string
 
 const (
-	name     = "avast"
+	name     = "fsecure"
 	category = "av"
 )
 
 type pluginResults struct {
 	ID   string      `json:"id" gorethink:"id,omitempty"`
-	Data ResultsData `json:"avast" gorethink:"avast"`
+	Data ResultsData `json:"fsecure" gorethink:"fsecure"`
 }
 
-// Avast json object
-type Avast struct {
-	Results ResultsData `json:"avast"`
+// FSecure json object
+type FSecure struct {
+	Results ResultsData `json:"fsecure"`
 }
 
 // ResultsData json object
@@ -47,33 +47,49 @@ type ResultsData struct {
 	Updated  string `json:"updated" gorethink:"updated"`
 }
 
-// ParseAvastOutput convert avast output into ResultsData struct
-func ParseAvastOutput(avastout string, path string) (ResultsData, error) {
+// ParseFSecureOutput convert fsecure output into ResultsData struct
+func ParseFSecureOutput(fsecureout string, path string) (ResultsData, error) {
 
-	avast := ResultsData{
+	// root@70bc84b1553c:/malware# fsav --virus-action1=none eicar.com.txt
+	// EVALUATION VERSION - FULLY FUNCTIONAL - FREE TO USE FOR 30 DAYS.
+	// To purchase license, please check http://www.F-Secure.com/purchase/
+	//
+	// F-Secure Anti-Virus CLI version 1.0  build 0060
+	//
+	// Scan started at Mon Aug 22 02:43:50 2016
+	// Database version: 2016-08-22_01
+	//
+	// eicar.com.txt: Infected: EICAR_Test_File [FSE]
+	// eicar.com.txt: Infected: EICAR-Test-File (not a virus) [Aquarius]
+	//
+	// Scan ended at Mon Aug 22 02:43:50 2016
+	// 1 file scanned
+	// 1 file infected
+
+	fsecure := ResultsData{
 		Infected: false,
-		Engine:   getAvastVersion(),
-		Database: getAvastVPS(),
+		Engine:   getFSecureVersion(),
+		Database: getFSecureVPS(),
 		Updated:  getUpdatedDate(),
 	}
 
-	result := strings.Split(avastout, "\t")
+	result := strings.Split(fsecureout, "\t")
 
-	if !strings.Contains(avastout, "[OK]") {
-		avast.Infected = true
-		avast.Result = strings.TrimSpace(result[1])
+	if !strings.Contains(fsecureout, "[OK]") {
+		fsecure.Infected = true
+		fsecure.Result = strings.TrimSpace(result[1])
 	}
 
-	return avast, nil
+	return fsecure, nil
 }
 
 // Get Anti-Virus scanner version
-func getAvastVersion() string {
-	versionOut := utils.RunCommand("/bin/scan", "-v")
+func getFSecureVersion() string {
+	versionOut := utils.RunCommand("/opt/f-secure/fsav/bin/fsav", "--version")
 	return strings.TrimSpace(versionOut)
 }
 
-func getAvastVPS() string {
+func getFSecureVPS() string {
 	versionOut := utils.RunCommand("/bin/scan", "-V")
 	return strings.TrimSpace(versionOut)
 }
@@ -98,26 +114,28 @@ func printStatus(resp gorequest.Response, body string, errs []error) {
 }
 
 func updateAV() error {
-	fmt.Println("Updating Avast...")
-	// Avast needs to have the daemon started first
-	exec.Command("/etc/init.d/avast", "start").Output()
+	fmt.Println("Updating FSecure...")
+	// FSecure needs to have the daemon started first
+	exec.Command("/etc/init.d/fsaua", "start").Output()
+	exec.Command("/etc/init.d/fsupdated", "start").Output()
 
-	fmt.Println(utils.RunCommand("/var/lib/avast/Setup/avast.vpsupdate"))
+	fmt.Println(utils.RunCommand("/opt/f-secure/fsav/bin/dbupdate"))
+
 	// Update UPDATED file
 	t := time.Now().Format("20060102")
 	err := ioutil.WriteFile("/opt/malice/UPDATED", []byte(t), 0644)
 	return err
 }
 
-func printMarkDownTable(avast Avast) {
+func printMarkDownTable(fsecure FSecure) {
 
-	fmt.Println("#### Avast")
+	fmt.Println("#### FSecure")
 	table := clitable.New([]string{"Infected", "Result", "Engine", "Updated"})
 	table.AddRow(map[string]interface{}{
-		"Infected": avast.Results.Infected,
-		"Result":   avast.Results.Result,
-		"Engine":   avast.Results.Engine,
-		"Updated":  avast.Results.Updated,
+		"Infected": fsecure.Results.Infected,
+		"Result":   fsecure.Results.Result,
+		"Engine":   fsecure.Results.Engine,
+		"Updated":  fsecure.Results.Updated,
 	})
 	table.Markdown = true
 	table.Print()
@@ -182,12 +200,12 @@ Run '{{.Name}} COMMAND --help' for more information on a command.
 func main() {
 	cli.AppHelpTemplate = appHelpTemplate
 	app := cli.NewApp()
-	app.Name = "avast"
+	app.Name = "f-secure"
 	app.Author = "blacktop"
 	app.Email = "https://github.com/blacktop"
 	app.Version = Version + ", BuildTime: " + BuildTime
 	app.Compiled, _ = time.Parse("20060102", BuildTime)
-	app.Usage = "Malice Avast AntiVirus Plugin"
+	app.Usage = "Malice F-Secure AntiVirus Plugin"
 	var rethinkdb string
 	app.Flags = []cli.Flag{
 		cli.BoolFlag{
@@ -238,17 +256,12 @@ func main() {
 			r.Log.Out = ioutil.Discard
 		}
 
-		// Avast needs to have the daemon started first
-		exec.Command("/etc/init.d/avast", "start").Output()
-		// Give avast service a few to finish
-		// time.Sleep(time.Second * 2)
-
 		var results ResultsData
 
-		results, err := ParseAvastOutput(utils.RunCommand("fsav", "--virus-action=none", path), path)
+		results, err := ParseFSecureOutput(utils.RunCommand("/opt/f-secure/fsav/bin/fsav", "--virus-action1=none", path), path)
 		if err != nil {
 			// If fails try a second time
-			results, err = ParseAvastOutput(utils.RunCommand("fsav", "--virus-action=none", path), path)
+			results, err = ParseFSecureOutput(utils.RunCommand("/opt/f-secure/fsav/bin/fsav", "--virus-action1=none", path), path)
 			utils.Assert(err)
 		}
 
@@ -259,14 +272,14 @@ func main() {
 			Data: results,
 		})
 
-		avast := Avast{
+		fsecure := FSecure{
 			Results: results,
 		}
 
 		if c.Bool("table") {
-			printMarkDownTable(avast)
+			printMarkDownTable(fsecure)
 		} else {
-			avastJSON, err := json.Marshal(avast)
+			fsecureJSON, err := json.Marshal(fsecure)
 			utils.Assert(err)
 			if c.Bool("post") {
 				request := gorequest.New()
@@ -275,10 +288,10 @@ func main() {
 				}
 				request.Post(os.Getenv("MALICE_ENDPOINT")).
 					Set("Task", path).
-					Send(avastJSON).
+					Send(fsecureJSON).
 					End(printStatus)
 			}
-			fmt.Println(string(avastJSON))
+			fmt.Println(string(fsecureJSON))
 		}
 		return nil
 	}
