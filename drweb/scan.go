@@ -1,7 +1,6 @@
 package main
 
 import (
-	"crypto/sha256"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -48,44 +47,6 @@ type ResultsData struct {
 	Updated  string `json:"updated" gorethink:"updated"`
 }
 
-func getopt(name, dfault string) string {
-	value := os.Getenv(name)
-	if value == "" {
-		value = dfault
-	}
-	return value
-}
-
-func assert(err error) {
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-// getSHA256 calculates a file's sha256sum
-func getSHA256(name string) string {
-
-	dat, err := ioutil.ReadFile(name)
-	assert(err)
-
-	h256 := sha256.New()
-	_, err = h256.Write(dat)
-	assert(err)
-
-	return fmt.Sprintf("%x", h256.Sum(nil))
-}
-
-// RunCommand runs cmd on file
-func RunCommand(cmd string, args ...string) string {
-
-	cmdOut, err := exec.Command(cmd, args...).Output()
-	if len(cmdOut) == 0 {
-		assert(err)
-	}
-
-	return string(cmdOut)
-}
-
 // ParseAvastOutput convert avast output into ResultsData struct
 func ParseAvastOutput(avastout string, path string) (ResultsData, error) {
 
@@ -108,12 +69,12 @@ func ParseAvastOutput(avastout string, path string) (ResultsData, error) {
 
 // Get Anti-Virus scanner version
 func getAvastVersion() string {
-	versionOut := RunCommand("/bin/scan", "-v")
+	versionOut := utils.RunCommand("/bin/scan", "-v")
 	return strings.TrimSpace(versionOut)
 }
 
 func getAvastVPS() string {
-	versionOut := RunCommand("/bin/scan", "-V")
+	versionOut := utils.RunCommand("/bin/scan", "-V")
 	return strings.TrimSpace(versionOut)
 }
 
@@ -128,7 +89,7 @@ func getUpdatedDate() string {
 		return BuildTime
 	}
 	updated, err := ioutil.ReadFile("/opt/malice/UPDATED")
-	assert(err)
+	utils.Assert(err)
 	return string(updated)
 }
 
@@ -141,7 +102,7 @@ func updateAV() error {
 	// Avast needs to have the daemon started first
 	exec.Command("/etc/init.d/avast", "start").Output()
 
-	fmt.Println(RunCommand("/var/lib/avast/Setup/avast.vpsupdate"))
+	fmt.Println(utils.RunCommand("/var/lib/avast/Setup/avast.vpsupdate"))
 	// Update UPDATED file
 	t := time.Now().Format("20060102")
 	err := ioutil.WriteFile("/opt/malice/UPDATED", []byte(t), 0644)
@@ -269,7 +230,7 @@ func main() {
 		path := c.Args().First()
 
 		if _, err := os.Stat(path); os.IsNotExist(err) {
-			assert(err)
+			utils.Assert(err)
 		}
 		if c.Bool("verbose") {
 			log.SetLevel(log.DebugLevel)
@@ -284,17 +245,17 @@ func main() {
 
 		var results ResultsData
 
-		results, err := ParseAvastOutput(RunCommand("scan", "-abfu", path), path)
+		results, err := ParseAvastOutput(utils.RunCommand("scan", "-abfu", path), path)
 		if err != nil {
 			// If fails try a second time
-			results, err = ParseAvastOutput(RunCommand("scan", "-abfu", path), path)
-			assert(err)
+			results, err = ParseAvastOutput(utils.RunCommand("scan", "-abfu", path), path)
+			utils.Assert(err)
 		}
 
 		// upsert into Database
 		// database.WriteToDatabase(pluginResults{
 		writeToDatabase(pluginResults{
-			ID:   getopt("MALICE_SCANID", getSHA256(path)),
+			ID:   utils.Getopt("MALICE_SCANID", utils.GetSHA256(path)),
 			Data: results,
 		})
 
@@ -306,7 +267,7 @@ func main() {
 			printMarkDownTable(avast)
 		} else {
 			avastJSON, err := json.Marshal(avast)
-			assert(err)
+			utils.Assert(err)
 			if c.Bool("post") {
 				request := gorequest.New()
 				if c.Bool("proxy") {
@@ -323,5 +284,5 @@ func main() {
 	}
 
 	err := app.Run(os.Args)
-	assert(err)
+	utils.Assert(err)
 }
