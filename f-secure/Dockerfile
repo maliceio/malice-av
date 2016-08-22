@@ -5,11 +5,9 @@ MAINTAINER blacktop, https://github.com/blacktop
 ENV FSECURE_VERSION 11.00.79-rtm
 
 # Install Requirements
-RUN set -x \
-  && buildDeps='ca-certificates lib32stdc++6 wget rpm' \
+RUN buildDeps='ca-certificates lib32stdc++6 wget rpm' \
   && apt-get update -qq \
   && apt-get install -yq $buildDeps \
-  && set -x \
   && echo "Install F-Secure..." \
   && cd /tmp \
   && wget https://download.f-secure.com/corpro/ls/trial/fsls-${FSECURE_VERSION}.tar.gz \
