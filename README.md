@@ -14,3 +14,4 @@ Collection of Malice AntiVirus Plugins
 -	[drweb](https://github.com/maliceio/malice-av/blob/master/drweb/README.md) (**WIP**)
 -	[fprot](https://github.com/maliceio/malice-av/blob/master/fprot/README.md)
 -	[f-secure](https://github.com/maliceio/malice-av/blob/master/f-secure/README.md) (**WIP**)
+-	[sophos](https://github.com/maliceio/malice-av/blob/master/sophos/README.md) (**WIP**)
