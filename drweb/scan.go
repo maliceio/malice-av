@@ -24,18 +24,18 @@ var Version string
 var BuildTime string
 
 const (
-	name     = "avast"
+	name     = "drweb"
 	category = "av"
 )
 
 type pluginResults struct {
 	ID   string      `json:"id" gorethink:"id,omitempty"`
-	Data ResultsData `json:"avast" gorethink:"avast"`
+	Data ResultsData `json:"drweb" gorethink:"drweb"`
 }
 
-// Avast json object
-type Avast struct {
-	Results ResultsData `json:"avast"`
+// DrWeb json object
+type DrWeb struct {
+	Results ResultsData `json:"drweb"`
 }
 
 // ResultsData json object
@@ -47,33 +47,35 @@ type ResultsData struct {
 	Updated  string `json:"updated" gorethink:"updated"`
 }
 
-// ParseAvastOutput convert avast output into ResultsData struct
-func ParseAvastOutput(avastout string, path string) (ResultsData, error) {
+// ParseDrWebOutput convert drweb output into ResultsData struct
+func ParseDrWebOutput(drwebout string, path string) (ResultsData, error) {
 
-	avast := ResultsData{
+	fmt.Println(drwebout)
+
+	drweb := ResultsData{
 		Infected: false,
-		Engine:   getAvastVersion(),
-		Database: getAvastVPS(),
+		Engine:   getDrWebVersion(),
+		Database: getDrWebVPS(),
 		Updated:  getUpdatedDate(),
 	}
 
-	result := strings.Split(avastout, "\t")
+	result := strings.Split(drwebout, "\t")
 
-	if !strings.Contains(avastout, "[OK]") {
-		avast.Infected = true
-		avast.Result = strings.TrimSpace(result[1])
+	if !strings.Contains(drwebout, "[OK]") {
+		drweb.Infected = true
+		drweb.Result = strings.TrimSpace(result[1])
 	}
 
-	return avast, nil
+	return drweb, nil
 }
 
 // Get Anti-Virus scanner version
-func getAvastVersion() string {
+func getDrWebVersion() string {
 	versionOut := utils.RunCommand("/bin/scan", "-v")
 	return strings.TrimSpace(versionOut)
 }
 
-func getAvastVPS() string {
+func getDrWebVPS() string {
 	versionOut := utils.RunCommand("/bin/scan", "-V")
 	return strings.TrimSpace(versionOut)
 }
@@ -98,26 +100,26 @@ func printStatus(resp gorequest.Response, body string, errs []error) {
 }
 
 func updateAV() error {
-	fmt.Println("Updating Avast...")
-	// Avast needs to have the daemon started first
-	exec.Command("/etc/init.d/avast", "start").Output()
+	fmt.Println("Updating DrWeb...")
+	// DrWeb needs to have the daemon started first
+	exec.Command("/etc/init.d/drweb", "start").Output()
 
-	fmt.Println(utils.RunCommand("/var/lib/avast/Setup/avast.vpsupdate"))
+	fmt.Println(utils.RunCommand("/var/lib/drweb/Setup/drweb.vpsupdate"))
 	// Update UPDATED file
 	t := time.Now().Format("20060102")
 	err := ioutil.WriteFile("/opt/malice/UPDATED", []byte(t), 0644)
 	return err
 }
 
-func printMarkDownTable(avast Avast) {
+func printMarkDownTable(drweb DrWeb) {
 
-	fmt.Println("#### Avast")
+	fmt.Println("#### DrWeb")
 	table := clitable.New([]string{"Infected", "Result", "Engine", "Updated"})
 	table.AddRow(map[string]interface{}{
-		"Infected": avast.Results.Infected,
-		"Result":   avast.Results.Result,
-		"Engine":   avast.Results.Engine,
-		"Updated":  avast.Results.Updated,
+		"Infected": drweb.Results.Infected,
+		"Result":   drweb.Results.Result,
+		"Engine":   drweb.Results.Engine,
+		"Updated":  drweb.Results.Updated,
 	})
 	table.Markdown = true
 	table.Print()
@@ -182,12 +184,12 @@ Run '{{.Name}} COMMAND --help' for more information on a command.
 func main() {
 	cli.AppHelpTemplate = appHelpTemplate
 	app := cli.NewApp()
-	app.Name = "avast"
+	app.Name = "drweb"
 	app.Author = "blacktop"
 	app.Email = "https://github.com/blacktop"
 	app.Version = Version + ", BuildTime: " + BuildTime
 	app.Compiled, _ = time.Parse("20060102", BuildTime)
-	app.Usage = "Malice Avast AntiVirus Plugin"
+	app.Usage = "Malice DrWeb AntiVirus Plugin"
 	var rethinkdb string
 	app.Flags = []cli.Flag{
 		cli.BoolFlag{
@@ -238,17 +240,17 @@ func main() {
 			r.Log.Out = ioutil.Discard
 		}
 
-		// Avast needs to have the daemon started first
-		exec.Command("/etc/init.d/avast", "start").Output()
-		// Give avast service a few to finish
+		// DrWeb needs to have the daemon started first
+		exec.Command("/etc/init.d/drweb", "start").Output()
+		// Give drweb service a few to finish
 		// time.Sleep(time.Second * 2)
 
 		var results ResultsData
 
-		results, err := ParseAvastOutput(utils.RunCommand("scan", "-abfu", path), path)
+		results, err := ParseDrWebOutput(utils.RunCommand("scan", "-abfu", path), path)
 		if err != nil {
 			// If fails try a second time
-			results, err = ParseAvastOutput(utils.RunCommand("scan", "-abfu", path), path)
+			results, err = ParseDrWebOutput(utils.RunCommand("scan", "-abfu", path), path)
 			utils.Assert(err)
 		}
 
@@ -259,14 +261,14 @@ func main() {
 			Data: results,
 		})
 
-		avast := Avast{
+		drweb := DrWeb{
 			Results: results,
 		}
 
 		if c.Bool("table") {
-			printMarkDownTable(avast)
+			printMarkDownTable(drweb)
 		} else {
-			avastJSON, err := json.Marshal(avast)
+			drwebJSON, err := json.Marshal(drweb)
 			utils.Assert(err)
 			if c.Bool("post") {
 				request := gorequest.New()
@@ -275,10 +277,10 @@ func main() {
 				}
 				request.Post(os.Getenv("MALICE_ENDPOINT")).
 					Set("Task", path).
-					Send(avastJSON).
+					Send(drwebJSON).
 					End(printStatus)
 			}
-			fmt.Println(string(avastJSON))
+			fmt.Println(string(drwebJSON))
 		}
 		return nil
 	}

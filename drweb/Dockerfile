@@ -25,7 +25,7 @@ RUN buildDeps='ca-certificates \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Install Go binary
-COPY . /go/src/github.com/maliceio/malice-avast
+COPY . /go/src/github.com/maliceio/malice-drweb
 RUN buildDeps='build-essential \
                golang-go \
                mercurial \
@@ -33,7 +33,7 @@ RUN buildDeps='build-essential \
     && apt-get update -qq \
     && apt-get install -yq $buildDeps --no-install-recommends \
     && echo "Building drweb malscan Go binary..." \
-    && cd /go/src/github.com/maliceio/malice-avast \
+    && cd /go/src/github.com/maliceio/malice-drweb \
     && export GOPATH=/go \
     && go version \
     && go get \
