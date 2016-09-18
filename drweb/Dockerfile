@@ -21,6 +21,7 @@ RUN buildDeps='ca-certificates \
   && echo 'deb http://repo.drweb.com/drweb/debian 10.0.0 non-free' >> /etc/apt/sources.list \
   && apt-key adv --fetch-keys http://repo.drweb.com/drweb/drweb.key \
   && apt-get update -q && apt-get install -y drweb-workstations \
+  && apt-get purge -y --auto-remove $buildDeps \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 

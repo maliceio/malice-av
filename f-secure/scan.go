@@ -119,9 +119,12 @@ func updateAV() error {
 	fmt.Println("Updating FSecure...")
 	// FSecure needs to have the daemon started first
 	exec.Command("/etc/init.d/fsaua", "start").Output()
-	exec.Command("/etc/init.d/fsupdated", "start").Output()
+	exec.Command("/etc/init.d/fsupdate", "start").Output()
 
-	fmt.Println(utils.RunCommand("/opt/f-secure/fsav/bin/dbupdate"))
+	fmt.Println(utils.RunCommand(
+		"/opt/f-secure/fsav/bin/dbupdate",
+		"/opt/f-secure/fsdbupdate9.run",
+	))
 
 	// Update UPDATED file
 	t := time.Now().Format("20060102")
