@@ -15,33 +15,37 @@ RUN buildDeps='ca-certificates lib32stdc++6 wget rpm' \
   && cd fsls-${FSECURE_VERSION} \
   && chmod a+x fsls-${FSECURE_VERSION} \
   && ./fsls-${FSECURE_VERSION} --auto standalone lang=en --command-line-only \
+  && fsav --version \
+  && echo "Update F-Secure..." \
+  && cd /tmp \
+  && wget http://download.f-secure.com/latest/fsdbupdate9.run \
+  && mv fsdbupdate9.run /opt/f-secure/ \
   && echo "Clean up unnecessary files..." \
   && apt-get purge -y --auto-remove $buildDeps \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /go
 
 # Install Go binary
-COPY . /go/src/github.com/maliceio/malice-fsecure
-RUN buildDeps='ca-certificates \
-               build-essential \
-               golang-go \
-               mercurial \
-               git-core' \
-  && apt-get update -qq \
-  && apt-get install -yq $buildDeps --no-install-recommends \
-  && echo "Building drweb malscan Go binary..." \
-  && cd /go/src/github.com/maliceio/malice-fsecure \
-  && export GOPATH=/go \
-  && go version \
-  && go get \
-  && go build -ldflags "-X main.Version $(cat VERSION) -X main.BuildTime $(date -u +%Y%m%d)" -o /bin/malscan \
-  && echo "Clean up unnecessary files..." \
-  && apt-get purge -y --auto-remove $buildDeps \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /go
+# COPY . /go/src/github.com/maliceio/malice-fsecure
+# RUN buildDeps='ca-certificates \
+#                build-essential \
+#                golang-go \
+#                mercurial \
+#                git-core' \
+#   && apt-get update -qq \
+#   && apt-get install -yq $buildDeps --no-install-recommends \
+#   && echo "Building drweb malscan Go binary..." \
+#   && cd /go/src/github.com/maliceio/malice-fsecure \
+#   && export GOPATH=/go \
+#   && go version \
+#   && go get \
+#   && go build -ldflags "-X main.Version $(cat VERSION) -X main.BuildTime $(date -u +%Y%m%d)" -o /bin/malscan \
+#   && echo "Clean up unnecessary files..." \
+#   && apt-get purge -y --auto-remove $buildDeps \
+#   && apt-get clean \
+#   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /go
 
 # Update F-Secure
-# COPY fsdbupdate9.run /opt/f-secure
 RUN set -x \
   && /etc/init.d/fsaua start \
   && /etc/init.d/fsupdated start \
@@ -50,8 +54,8 @@ RUN set -x \
 # Add EICAR Test Virus File to malware folder
 ADD http://www.eicar.org/download/eicar.com.txt /malware/EICAR
 
-WORKDIR /malware
-
-ENTRYPOINT ["/bin/malscan"]
-
-CMD ["--help"]
+# WORKDIR /malware
+#
+# ENTRYPOINT ["/bin/malscan"]
+#
+# CMD ["--help"]

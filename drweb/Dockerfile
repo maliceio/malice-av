@@ -47,7 +47,7 @@ RUN buildDeps='build-essential \
 ADD http://www.eicar.org/download/eicar.com.txt /malware/EICAR
 
 # Update Dr Web AV Definitions
-RUN drweb-ctl update
+# RUN drweb-ctl update
 
 WORKDIR /malware
 
