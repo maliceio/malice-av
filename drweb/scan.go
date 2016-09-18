@@ -50,7 +50,7 @@ type ResultsData struct {
 // ParseDrWebOutput convert drweb output into ResultsData struct
 func ParseDrWebOutput(drwebout string, path string) (ResultsData, error) {
 
-	fmt.Println(drwebout)
+	log.Debugln(drwebout)
 
 	drweb := ResultsData{
 		Infected: false,
@@ -255,7 +255,6 @@ func main() {
 		}
 
 		// upsert into Database
-		// database.WriteToDatabase(pluginResults{
 		writeToDatabase(pluginResults{
 			ID:   utils.Getopt("MALICE_SCANID", utils.GetSHA256(path)),
 			Data: results,

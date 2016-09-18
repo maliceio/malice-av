@@ -66,6 +66,8 @@ func ParseFSecureOutput(fsecureout string, path string) (ResultsData, error) {
 	// 1 file scanned
 	// 1 file infected
 
+	log.Debugln(fsecureout)
+
 	fsecure := ResultsData{
 		Infected: false,
 		Engine:   getFSecureVersion(),
@@ -129,7 +131,7 @@ func updateAV() error {
 
 func printMarkDownTable(fsecure FSecure) {
 
-	fmt.Println("#### FSecure")
+	fmt.Println("#### F-Secure")
 	table := clitable.New([]string{"Infected", "Result", "Engine", "Updated"})
 	table.AddRow(map[string]interface{}{
 		"Infected": fsecure.Results.Infected,
@@ -200,7 +202,7 @@ Run '{{.Name}} COMMAND --help' for more information on a command.
 func main() {
 	cli.AppHelpTemplate = appHelpTemplate
 	app := cli.NewApp()
-	app.Name = "f-secure"
+	app.Name = "fsecure"
 	app.Author = "blacktop"
 	app.Email = "https://github.com/blacktop"
 	app.Version = Version + ", BuildTime: " + BuildTime
@@ -266,7 +268,6 @@ func main() {
 		}
 
 		// upsert into Database
-		// database.WriteToDatabase(pluginResults{
 		writeToDatabase(pluginResults{
 			ID:   utils.Getopt("MALICE_SCANID", utils.GetSHA256(path)),
 			Data: results,

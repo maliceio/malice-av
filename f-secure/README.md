@@ -1,9 +1,9 @@
-malice-f-secure
+malice-fsecure
 ===============
 
-[![License](http://img.shields.io/:license-mit-blue.svg)](http://doge.mit-license.org) [![Docker Stars](https://img.shields.io/docker/stars/malice/f-secure.svg)](https://hub.docker.com/r/malice/f-secure/) [![Docker Pulls](https://img.shields.io/docker/pulls/malice/f-secure.svg)](https://hub.docker.com/r/malice/f-secure/)
+[![License](http://img.shields.io/:license-mit-blue.svg)](http://doge.mit-license.org) [![Docker Stars](https://img.shields.io/docker/stars/malice/fsecure.svg)](https://hub.docker.com/r/malice/fsecure/) [![Docker Pulls](https://img.shields.io/docker/pulls/malice/fsecure.svg)](https://hub.docker.com/r/malice/fsecure/)
 
-This repository contains a **Dockerfile** of [f-secure](https://www.f-secure.com/en/web/business_global/downloads/linux-security/latest) for [Docker](https://www.docker.io/)'s [trusted build](https://hub.docker.com/r/malice/f-secure/) published to the public [DockerHub](https://index.docker.io/).
+This repository contains a **Dockerfile** of [fsecure](https://www.fsecure.com/en/web/business_global/downloads/linux-security/latest) for [Docker](https://www.docker.io/)'s [trusted build](https://hub.docker.com/r/malice/fsecure/) published to the public [DockerHub](https://index.docker.io/).
 
 ### Dependencies
 
@@ -12,20 +12,20 @@ This repository contains a **Dockerfile** of [f-secure](https://www.f-secure.com
 ### Installation
 
 1.	Install [Docker](https://www.docker.io/).
-2.	Download [trusted build](https://hub.docker.com/r/malice/f-secure/) from public [DockerHub](https://hub.docker.com): `docker pull malice/f-secure`
+2.	Download [trusted build](https://hub.docker.com/r/malice/fsecure/) from public [DockerHub](https://hub.docker.com): `docker pull malice/fsecure`
 
 ### Usage
 
 ```
-docker run --rm malice/f-secure EICAR
+docker run --rm malice/fsecure EICAR
 ```
 
 #### Or link your own malware folder:
 
 ```bash
-$ docker run --rm -v /path/to/malware:/malware:ro malice/f-secure FILE
+$ docker run --rm -v /path/to/malware:/malware:ro malice/fsecure FILE
 
-Usage: f-secure [OPTIONS] COMMAND [arg...]
+Usage: fsecure [OPTIONS] COMMAND [arg...]
 
 Malice F-Secure AntiVirus Plugin
 
@@ -47,7 +47,7 @@ Commands:
   update        Update virus definitions
   help          Shows a list of commands or help for one command
 
-Run 'f-secure COMMAND --help' for more information on a command.
+Run 'fsecure COMMAND --help' for more information on a command.
 ```
 
 This will output to stdout and POST to malice results API webhook endpoint.
@@ -56,7 +56,7 @@ This will output to stdout and POST to malice results API webhook endpoint.
 
 ```json
 {
-  "f-secure": {
+  "fsecure": {
     "infected": true,
     "result": "EICAR Test-NOT virus!!!",
     "engine": "2.1.2",
@@ -83,7 +83,7 @@ This will output to stdout and POST to malice results API webhook endpoint.
 ```bash
 $ docker volume create --name malice
 $ docker run -d -p 28015:28015 -p 8080:8080 -v malice:/data --name rethink rethinkdb
-$ docker run --rm -v /path/to/malware:/malware:ro --link rethink:rethink malice/f-secure -t FILE
+$ docker run --rm -v /path/to/malware:/malware:ro --link rethink:rethink malice/fsecure -t FILE
 ```
 
 ### Documentation
@@ -91,15 +91,15 @@ $ docker run --rm -v /path/to/malware:/malware:ro --link rethink:rethink malice/
 To update the AV run the following:
 
 ```bash
-$ docker run --name=f-secure malice/f-secure update
+$ docker run --name=fsecure malice/fsecure update
 ```
 
-Then to use the updated f-secure container:
+Then to use the updated fsecure container:
 
 ```bash
-$ docker commit f-secure malice/f-secure:updated
-$ docker rm f-secure # clean up updated container
-$ docker run --rm malice/f-secure:updated EICAR
+$ docker commit fsecure malice/fsecure:updated
+$ docker rm fsecure # clean up updated container
+$ docker run --rm malice/fsecure:updated EICAR
 ```
 
 ### Issues
