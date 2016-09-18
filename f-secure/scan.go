@@ -30,12 +30,12 @@ const (
 
 type pluginResults struct {
 	ID   string      `json:"id" gorethink:"id,omitempty"`
-	Data ResultsData `json:"fsecure" gorethink:"fsecure"`
+	Data ResultsData `json:"f-secure" gorethink:"f-secure"`
 }
 
 // FSecure json object
 type FSecure struct {
-	Results ResultsData `json:"fsecure"`
+	Results ResultsData `json:"f-secure"`
 }
 
 // ResultsData json object
@@ -202,7 +202,7 @@ Run '{{.Name}} COMMAND --help' for more information on a command.
 func main() {
 	cli.AppHelpTemplate = appHelpTemplate
 	app := cli.NewApp()
-	app.Name = "fsecure"
+	app.Name = "f-secure"
 	app.Author = "blacktop"
 	app.Email = "https://github.com/blacktop"
 	app.Version = Version + ", BuildTime: " + BuildTime
