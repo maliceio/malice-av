@@ -5,15 +5,12 @@ MAINTAINER blacktop, https://github.com/blacktop
 RUN buildDeps='ca-certificates \
                wget' \
   && apt-get update -qq \
-  && apt-get install -yq $buildDeps iptables-persistent libc6-i386 \
+  && apt-get install -yq $buildDeps \
   && set -x \
   && echo "Install Dr Web..." \
-  && cd /tmp \
-  && wget http://download.geo.drweb.com/pub/drweb/unix/workstation/11.0/drweb-11.0.1-av-linux-amd64.run \
-  && chmod +x drweb-11.0.1-av-linux-amd64.run
-  # && echo 'deb http://repo.drweb.com/drweb/debian 10.0.0 non-free' >> /etc/apt/sources.list \
-  # && apt-key adv --fetch-keys http://repo.drweb.com/drweb/drweb.key \
-  # && apt-get update -q && apt-get install -y drweb-workstations \
+  && echo 'deb http://repo.drweb.com/drweb/debian 10.0.0 non-free' >> /etc/apt/sources.list \
+  && apt-key adv --fetch-keys http://repo.drweb.com/drweb/drweb.key \
+  && apt-get update -q && apt-get install -y drweb-workstations
   # && apt-get purge -y --auto-remove $buildDeps \
   # && apt-get clean \
   # && rm -rf /var/lib/apt/lists/* /tmp/*
@@ -34,7 +31,7 @@ RUN buildDeps='ca-certificates \
 #                mercurial \
 #                git-core \
 #
-# libc6-i386
+# iptables-persistent libc6-i386
 
 # Install Go binary
 # COPY . /go/src/github.com/maliceio/malice-drweb
