@@ -71,12 +71,12 @@ func ParseDrWebOutput(drwebout string, path string) (ResultsData, error) {
 
 // Get Anti-Virus scanner version
 func getDrWebVersion() string {
-	versionOut := utils.RunCommand("/bin/scan", "-v")
-	return strings.TrimSpace(versionOut)
+	versionOut := utils.RunCommand("drweb-ctl", "-v")
+	return strings.TrimSpace(strings.TrimPrefix(versionOut, "drweb-ctl"))
 }
 
 func getDrWebVPS() string {
-	versionOut := utils.RunCommand("/bin/scan", "-V")
+	versionOut := utils.RunCommand("drweb-ctl", "scan", "-V")
 	return strings.TrimSpace(versionOut)
 }
 
@@ -247,10 +247,10 @@ func main() {
 
 		var results ResultsData
 
-		results, err := ParseDrWebOutput(utils.RunCommand("scan", "-abfu", path), path)
+		results, err := ParseDrWebOutput(utils.RunCommand("drweb-ctl", "scan", "-abfu", path), path)
 		if err != nil {
 			// If fails try a second time
-			results, err = ParseDrWebOutput(utils.RunCommand("scan", "-abfu", path), path)
+			results, err = ParseDrWebOutput(utils.RunCommand("drweb-ctl", "scan", "-abfu", path), path)
 			utils.Assert(err)
 		}
 

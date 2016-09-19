@@ -137,13 +137,21 @@ func getFSecureVersion() (version string, database string) {
 	lines := strings.Split(versionOut, "\n")
 
 	for _, line := range lines {
+
 		if strings.Contains(line, "F-Secure Linux Security version") {
-			version = strings.Split(line, ":")[1]
+			version = strings.TrimSpace(strings.TrimPrefix(line, "F-Secure Linux Security version"))
 		}
+
 		if strings.Contains(line, "Database version:") {
-			database = strings.Split(line, ":")[1]
-			break
+			parts := strings.Split(line, ":")
+			if len(parts) == 2 {
+				database = strings.TrimSpace(parts[1])
+				break
+			} else {
+				log.Error("Umm... ", parts)
+			}
 		}
+
 	}
 
 	return
