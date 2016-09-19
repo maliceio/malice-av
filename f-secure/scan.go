@@ -90,6 +90,7 @@ func ParseFSecureOutput(fsecureout string, path string) (ResultsData, error) {
 			fsecure.Infected = true
 			parts := strings.Split(line, "Infected:")
 			fsecure.Results.FSE = strings.TrimSuffix(parts[1], "[FSE]")
+			continue
 		}
 		if strings.Contains(line, "Infected:") && strings.Contains(line, "[Aquarius]") {
 			fsecure.Infected = true
