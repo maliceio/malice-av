@@ -40,11 +40,17 @@ type FSecure struct {
 
 // ResultsData json object
 type ResultsData struct {
-	Infected bool   `json:"infected" gorethink:"infected"`
-	Result   string `json:"result" gorethink:"result"`
-	Engine   string `json:"engine" gorethink:"engine"`
-	Database string `json:"database" gorethink:"database"`
-	Updated  string `json:"updated" gorethink:"updated"`
+	Infected bool        `json:"infected" gorethink:"infected"`
+	Results  ScanEngines `json:"results" gorethink:"results"`
+	Engine   string      `json:"engine" gorethink:"engine"`
+	Database string      `json:"database" gorethink:"database"`
+	Updated  string      `json:"updated" gorethink:"updated"`
+}
+
+// ScanEngines scan engine results
+type ScanEngines struct {
+	FSE      string `json:"fse" gorethink:"fse"`
+	Aquarius string `json:"aquarius" gorethink:"aquarius"`
 }
 
 // ParseFSecureOutput convert fsecure output into ResultsData struct
@@ -68,32 +74,79 @@ func ParseFSecureOutput(fsecureout string, path string) (ResultsData, error) {
 
 	log.Debugln(fsecureout)
 
+	version, database := getFSecureVersion()
+
 	fsecure := ResultsData{
 		Infected: false,
-		Engine:   getFSecureVersion(),
-		Database: getFSecureVPS(),
+		Engine:   version,
+		Database: database,
 		Updated:  getUpdatedDate(),
 	}
 
-	result := strings.Split(fsecureout, "\t")
+	lines := strings.Split(fsecureout, "\n")
 
-	if !strings.Contains(fsecureout, "[OK]") {
-		fsecure.Infected = true
-		fsecure.Result = strings.TrimSpace(result[1])
+	for _, line := range lines {
+		if strings.Contains(line, "Infected:") && strings.Contains(line, "[FSE]") {
+			fsecure.Infected = true
+			parts := strings.Split(line, "Infected:")
+			fsecure.Results.FSE = strings.TrimSuffix(parts[1], "[FSE]")
+		}
+		if strings.Contains(line, "Infected:") && strings.Contains(line, "[Aquarius]") {
+			fsecure.Infected = true
+			parts := strings.Split(line, "Infected:")
+			fsecure.Results.FSE = strings.TrimSuffix(parts[1], "[Aquarius]")
+		}
 	}
 
 	return fsecure, nil
 }
 
 // Get Anti-Virus scanner version
-func getFSecureVersion() string {
-	versionOut := utils.RunCommand("/opt/f-secure/fsav/bin/fsav", "--version")
-	return strings.TrimSpace(versionOut)
-}
+func getFSecureVersion() (version string, database string) {
 
-func getFSecureVPS() string {
-	versionOut := utils.RunCommand("/bin/scan", "-V")
-	return strings.TrimSpace(versionOut)
+	// root@4b01c723f943:/malware# /opt/f-secure/fsav/bin/fsav --version
+	// EVALUATION VERSION - FULLY FUNCTIONAL - FREE TO USE FOR 30 DAYS.
+	// To purchase license, please check http://www.F-Secure.com/purchase/
+	//
+	// F-Secure Linux Security version 11.00 build 79
+	//
+	// F-Secure Anti-Virus CLI Command line client version:
+	// 	F-Secure Anti-Virus CLI version 1.0  build 0060
+	//
+	// F-Secure Anti-Virus CLI Daemon version:
+	// 	F-Secure Anti-Virus Daemon version 1.0  build 0117
+	//
+	// Database version: 2016-09-19_01
+	//
+	// Scanner Engine versions:
+	// 	F-Secure Corporation Hydra engine version 5.15 build 154
+	// 	F-Secure Corporation Hydra database version 2016-09-16_01
+	//
+	// 	F-Secure Corporation Aquarius engine version 1.0 build 3
+	// 	F-Secure Corporation Aquarius database version 2016-09-19_01
+	//
+	// Portions:
+	// Copyright (c) 1994-2010 Lua.org, PUC-Rio.
+	// Copyright (c) Reuben Thomas 2000-2010.
+	//
+	// For full license information on Hydra engine please see licenses-fselinux.txt in the databases folder
+
+	exec.Command("/opt/f-secure/fsav/bin/fsavd").Output()
+	versionOut := utils.RunCommand("/opt/f-secure/fsav/bin/fsav", "--version")
+
+	lines := strings.Split(versionOut, "\n")
+
+	for _, line := range lines {
+		if strings.Contains(line, "F-Secure Linux Security version") {
+			version = strings.Split(line, ":")[1]
+		}
+		if strings.Contains(line, "Database version:") {
+			database = strings.Split(line, ":")[1]
+			break
+		}
+	}
+
+	return
 }
 
 func parseUpdatedDate(date string) string {
@@ -138,7 +191,7 @@ func printMarkDownTable(fsecure FSecure) {
 	table := clitable.New([]string{"Infected", "Result", "Engine", "Updated"})
 	table.AddRow(map[string]interface{}{
 		"Infected": fsecure.Results.Infected,
-		"Result":   fsecure.Results.Result,
+		"Results":  fsecure.Results.Results.Aquarius,
 		"Engine":   fsecure.Results.Engine,
 		"Updated":  fsecure.Results.Updated,
 	})

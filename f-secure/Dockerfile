@@ -25,6 +25,11 @@ RUN buildDeps='ca-certificates wget rpm' \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/*
 
+# Update F-Secure
+RUN /etc/init.d/fsaua start \
+  && /etc/init.d/fsupdate start \
+  && /opt/f-secure/fsav/bin/dbupdate /opt/f-secure/fsdbupdate9.run; exit 0
+
 # Install Go binary
 COPY . /go/src/github.com/maliceio/malice-fsecure
 RUN buildDeps='ca-certificates \
@@ -44,11 +49,6 @@ RUN buildDeps='ca-certificates \
   && apt-get purge -y --auto-remove $buildDeps \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /go
-
-# Update F-Secure
-RUN /etc/init.d/fsaua start \
-  && /etc/init.d/fsupdate start \
-  && /opt/f-secure/fsav/bin/dbupdate /opt/f-secure/fsdbupdate9.run
 
 # Add EICAR Test Virus File to malware folder
 ADD http://www.eicar.org/download/eicar.com.txt /malware/EICAR
