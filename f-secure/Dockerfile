@@ -7,7 +7,7 @@ ENV FSECURE_VERSION 11.00.79-rtm
 # Install Requirements
 RUN buildDeps='ca-certificates wget rpm' \
   && apt-get update -qq \
-  && apt-get install -yq $buildDeps lib32stdc++6 \
+  && apt-get install -yq $buildDeps lib32stdc++6 psmisc \
   && echo "Install F-Secure..." \
   && cd /tmp \
   && wget https://download.f-secure.com/corpro/ls/trial/fsls-${FSECURE_VERSION}.tar.gz \
@@ -46,8 +46,7 @@ RUN buildDeps='ca-certificates \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /go
 
 # Update F-Secure
-RUN set -x \
-  && /etc/init.d/fsaua start \
+RUN /etc/init.d/fsaua start \
   && /etc/init.d/fsupdate start \
   && /opt/f-secure/fsav/bin/dbupdate /opt/f-secure/fsdbupdate9.run
 
