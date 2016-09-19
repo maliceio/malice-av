@@ -41,7 +41,7 @@ type FSecure struct {
 // ResultsData json object
 type ResultsData struct {
 	Infected bool        `json:"infected" gorethink:"infected"`
-	Results  ScanEngines `json:"results" gorethink:"results"`
+	Engines  ScanEngines `json:"results" gorethink:"results"`
 	Engine   string      `json:"engine" gorethink:"engine"`
 	Database string      `json:"database" gorethink:"database"`
 	Updated  string      `json:"updated" gorethink:"updated"`
@@ -54,7 +54,7 @@ type ScanEngines struct {
 }
 
 // ParseFSecureOutput convert fsecure output into ResultsData struct
-func ParseFSecureOutput(fsecureout string, path string) (ResultsData, error) {
+func ParseFSecureOutput(fsecureout string) (ResultsData, error) {
 
 	// root@70bc84b1553c:/malware# fsav --virus-action1=none eicar.com.txt
 	// EVALUATION VERSION - FULLY FUNCTIONAL - FREE TO USE FOR 30 DAYS.
@@ -89,20 +89,20 @@ func ParseFSecureOutput(fsecureout string, path string) (ResultsData, error) {
 		if strings.Contains(line, "Infected:") && strings.Contains(line, "[FSE]") {
 			fsecure.Infected = true
 			parts := strings.Split(line, "Infected:")
-			fsecure.Results.FSE = strings.TrimSuffix(parts[1], "[FSE]")
+			fsecure.Engines.FSE = strings.TrimSpace(strings.TrimSuffix(parts[1], "[FSE]"))
 			continue
 		}
 		if strings.Contains(line, "Infected:") && strings.Contains(line, "[Aquarius]") {
 			fsecure.Infected = true
 			parts := strings.Split(line, "Infected:")
-			fsecure.Results.FSE = strings.TrimSuffix(parts[1], "[Aquarius]")
+			fsecure.Engines.Aquarius = strings.TrimSpace(strings.TrimSuffix(parts[1], "[Aquarius]"))
 		}
 	}
 
 	return fsecure, nil
 }
 
-// Get Anti-Virus scanner version
+// getFSecureVersion get Anti-Virus scanner version
 func getFSecureVersion() (version string, database string) {
 
 	// root@4b01c723f943:/malware# /opt/f-secure/fsav/bin/fsav --version
@@ -134,6 +134,11 @@ func getFSecureVersion() (version string, database string) {
 
 	exec.Command("/opt/f-secure/fsav/bin/fsavd").Output()
 	versionOut := utils.RunCommand("/opt/f-secure/fsav/bin/fsav", "--version")
+
+	return parseFSecureVersion(versionOut)
+}
+
+func parseFSecureVersion(versionOut string) (version string, database string) {
 
 	lines := strings.Split(versionOut, "\n")
 
@@ -200,7 +205,7 @@ func printMarkDownTable(fsecure FSecure) {
 	table := clitable.New([]string{"Infected", "Result", "Engine", "Updated"})
 	table.AddRow(map[string]interface{}{
 		"Infected": fsecure.Results.Infected,
-		"Results":  fsecure.Results.Results.Aquarius,
+		"Result":   fsecure.Results.Engines.Aquarius,
 		"Engine":   fsecure.Results.Engine,
 		"Updated":  fsecure.Results.Updated,
 	})
@@ -325,10 +330,10 @@ func main() {
 
 		var results ResultsData
 
-		results, err := ParseFSecureOutput(utils.RunCommand("/opt/f-secure/fsav/bin/fsav", "--virus-action1=none", path), path)
+		results, err := ParseFSecureOutput(utils.RunCommand("/opt/f-secure/fsav/bin/fsav", "--virus-action1=none", path))
 		if err != nil {
 			// If fails try a second time
-			results, err = ParseFSecureOutput(utils.RunCommand("/opt/f-secure/fsav/bin/fsav", "--virus-action1=none", path), path)
+			results, err = ParseFSecureOutput(utils.RunCommand("/opt/f-secure/fsav/bin/fsav", "--virus-action1=none", path))
 			utils.Assert(err)
 		}
 

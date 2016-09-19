@@ -29,7 +29,7 @@ Usage: f-secure [OPTIONS] COMMAND [arg...]
 
 Malice F-Secure AntiVirus Plugin
 
-Version: v0.1.0, BuildTime: 20160618
+Version: v0.1.0, BuildTime: 20160919
 
 Author:
   blacktop - <https://github.com/blacktop>
@@ -44,8 +44,8 @@ Options:
   --version, -v         print the version
 
 Commands:
-  update        Update virus definitions
-  help          Shows a list of commands or help for one command
+  update  Update virus definitions
+  help    Shows a list of commands or help for one command
 
 Run 'f-secure COMMAND --help' for more information on a command.
 ```
@@ -58,10 +58,13 @@ This will output to stdout and POST to malice results API webhook endpoint.
 {
   "f-secure": {
     "infected": true,
-    "result": "EICAR Test-NOT virus!!!",
-    "engine": "2.1.2",
-    "database": "16061703",
-    "updated": "20160618"
+    "results": {
+      "fse": "EICAR_Test_File",
+      "aquarius": "EICAR-Test-File (not a virus)"
+    },
+    "engine": "11.00 build 79",
+    "database": "2016-09-19_01",
+    "updated": "20160919"
   }
 }
 ```
@@ -71,10 +74,9 @@ This will output to stdout and POST to malice results API webhook endpoint.
 ---
 
 #### F-Secure
-
-| Infected | Result                  | Engine | Updated  |
-|----------|-------------------------|--------|----------|
-| true     | EICAR Test-NOT virus!!! | 2.1.2  | 20160618 |
+| Infected | Result                        | Engine         | Updated  |
+| -------- | ----------------------------- | -------------- | -------- |
+| true     | EICAR-Test-File (not a virus) | 11.00 build 79 | 20160919 |
 
 ---
 
