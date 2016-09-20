@@ -29,7 +29,7 @@ Usage: sophos [OPTIONS] COMMAND [arg...]
 
 Malice Sophos AntiVirus Plugin
 
-Version: v0.1.0, BuildTime: 20160618
+Version: v0.1.0, BuildTime: 20160920
 
 Author:
   blacktop - <https://github.com/blacktop>
@@ -58,10 +58,10 @@ This will output to stdout and POST to malice results API webhook endpoint.
 {
   "sophos": {
     "infected": true,
-    "result": "EICAR Test-NOT virus!!!",
-    "engine": "2.1.2",
-    "database": "16061703",
-    "updated": "20160618"
+    "result": "EICAR-AV-Test",
+    "engine": "5.27.0",
+    "database": "5.31",
+    "updated": "20160920"
   }
 }
 ```
@@ -72,9 +72,9 @@ This will output to stdout and POST to malice results API webhook endpoint.
 
 #### Sophos
 
-| Infected | Result                  | Engine | Updated  |
-|----------|-------------------------|--------|----------|
-| true     | EICAR Test-NOT virus!!! | 2.1.2  | 20160618 |
+| Infected | Result        | Engine | Updated  |
+| -------- | ------------- | ------ | -------- |
+| true     | EICAR-AV-Test | 5.27.0 | 20160920 |
 
 ---
 

@@ -4,3 +4,5 @@
 .gitignore
 README.md
 LICENSE
+NOTES.md
+scan_test.go

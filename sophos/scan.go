@@ -70,25 +70,30 @@ func ParseSophosOutput(sophosout string, path string) (ResultsData, error) {
 	// Threat Center at: http://www.sophos.com/en-us/threat-center.aspx
 	// End of Scan.
 
+	version, database := getSophosVersion()
+
 	sophos := ResultsData{
 		Infected: false,
-		Engine:   getSophosVersion(),
-		Database: getSophosVPS(),
+		Engine:   version,
+		Database: database,
 		Updated:  getUpdatedDate(),
 	}
 
-	result := strings.Split(sophosout, "\t")
+	lines := strings.Split(sophosout, "\n")
 
-	if !strings.Contains(sophosout, "[OK]") {
-		sophos.Infected = true
-		sophos.Result = strings.TrimSpace(result[1])
+	for _, line := range lines {
+		if strings.Contains(line, ">>> Virus") && strings.Contains(line, "found in file") {
+			parts := strings.Split(line, "'")
+			sophos.Result = strings.TrimSpace(parts[1])
+			sophos.Infected = true
+		}
 	}
 
 	return sophos, nil
 }
 
 // Get Anti-Virus scanner version
-func getSophosVersion() string {
+func getSophosVersion() (version string, database string) {
 	// root@0e01fb905ffb:/malware# /opt/sophos/bin/savscan --version
 	// SAVScan virus detection utility
 	// Copyright (c) 1989-2016 Sophos Limited. All rights reserved.
@@ -102,13 +107,35 @@ func getSophosVersion() string {
 	// Platform                  : Linux/AMD64
 	// Released                  : 26 April 2016
 	// Total viruses (with IDEs) : 11283995
-	versionOut := utils.RunCommand("/opt/sophos/fsav/bin/fsav", "--version")
-	return strings.TrimSpace(versionOut)
+	versionOut := utils.RunCommand("/opt/sophos/bin/savscan", "--version")
+	return parseSophosVersion(versionOut)
 }
 
-func getSophosVPS() string {
-	versionOut := utils.RunCommand("/bin/scan", "-V")
-	return strings.TrimSpace(versionOut)
+func parseSophosVersion(versionOut string) (version string, database string) {
+
+	lines := strings.Split(versionOut, "\n")
+
+	for _, line := range lines {
+		if strings.Contains(line, "Product version") {
+			parts := strings.Split(line, ":")
+			if len(parts) == 2 {
+				version = strings.TrimSpace(parts[1])
+			} else {
+				log.Error("Umm... ", parts)
+			}
+		}
+		if strings.Contains(line, "Virus data version") {
+			parts := strings.Split(line, ":")
+			if len(parts) == 2 {
+				database = strings.TrimSpace(parts[1])
+				break
+			} else {
+				log.Error("Umm... ", parts)
+			}
+		}
+	}
+
+	return
 }
 
 func parseUpdatedDate(date string) string {
@@ -235,7 +262,7 @@ func main() {
 	app.Email = "https://github.com/blacktop"
 	app.Version = Version + ", BuildTime: " + BuildTime
 	app.Compiled, _ = time.Parse("20060102", BuildTime)
-	app.Usage = "Malice F-Secure AntiVirus Plugin"
+	app.Usage = "Malice Sophos AntiVirus Plugin"
 	var rethinkdb string
 	app.Flags = []cli.Flag{
 		cli.BoolFlag{
@@ -288,15 +315,14 @@ func main() {
 
 		var results ResultsData
 
-		results, err := ParseSophosOutput(utils.RunCommand("savscan", "--virus-action1=none", path), path)
+		results, err := ParseSophosOutput(utils.RunCommand("savscan", "-f", path), path)
 		if err != nil {
 			// If fails try a second time
-			results, err = ParseSophosOutput(utils.RunCommand("savscan", "--virus-action1=none", path), path)
+			results, err = ParseSophosOutput(utils.RunCommand("savscan", "-f", path), path)
 			utils.Assert(err)
 		}
 
 		// upsert into Database
-		// database.WriteToDatabase(pluginResults{
 		writeToDatabase(pluginResults{
 			ID:   utils.Getopt("MALICE_SCANID", utils.GetSHA256(path)),
 			Data: results,
