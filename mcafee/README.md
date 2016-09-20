@@ -1,1 +1,6 @@
-http://b2b-download.mcafee.com/products/evaluation/vcl/l64/vscl-l64-604-e.tar.gz
+ - http://b2b-download.mcafee.com/products/evaluation/vcl/l64/vscl-l64-604-e.tar.gz
+ - http://b2b-download.mcafee.com/products/naibeta-download/vscl/6.0.5/Beta/Readme_Linux.txt
+ - http://mcafee.com/apps/downloads/free-evaluations/productdownload.aspx?id=a5199a19-e5b7-4b32-b309-6d1aa82c926e
+ - http://www.mcafee.com/apps/downloads/free-evaluations/productdownload.aspx?id=a5199a19-e5b7-4b32-b309-6d1aa82c926e
+ - https://secure.mcafee.com/apps/downloads/free-evaluations/survey.aspx?mktg=ESD306&cid=ESD306&eval=B22B03DB-D24C-4C23-AA34-FEA470B1EF6E&region=us
+ - http://b2b-download.mcafee.com/products/naibeta-download/vscl/6.0.6/Beta/Readme_Linux.txt

@@ -8,16 +8,19 @@ RUN buildDeps='ca-certificates \
   && apt-get install -yq $buildDeps \
   && set -x \
   && echo "Install Dr Web..." \
-  && echo 'deb http://repo.drweb.com/drweb/debian 10.0.0 non-free' >> /etc/apt/sources.list \
-  && apt-key adv --fetch-keys http://repo.drweb.com/drweb/drweb.key \
-  && apt-get update -q && apt-get install -y drweb-workstations
+  && echo 'deb http://officeshield.drweb.com/drweb/debian stable non-free' >> /etc/apt/sources.list \
+  && apt-key adv --fetch-keys http://officeshield.drweb.com/drweb/drweb.key \
+  && apt-get update -q && apt-get install -y drweb-cc
   # && apt-get purge -y --auto-remove $buildDeps \
   # && apt-get clean \
   # && rm -rf /var/lib/apt/lists/* /tmp/*
+http://download.geo.drweb.com/pub/drweb/unix/workstation/11.0/drweb-11.0.1-av-linux-amd64.run
+# deb http://repo.drweb.com/drweb/debian 11.0 non-free <<<<<<<<<<<<<<<<<<<<<<
 
 #   && cd /tmp \
 #   && wget http://download.geo.drweb.com/pub/drweb/unix/workstation/11.0/drweb-11.0.1-av-linux-amd64.run \
 #   && chmod +x drweb-11.0.1-av-linux-amd64.run
+#   && ./drweb-11.0.1-av-linux-amd64.run -- --non-interactive
 # http://download.geo.drweb.com/pub/drweb/unix/workstation/11.0/drweb-11.0.1-av-linux-amd64.run
 
 #                build-essential \
@@ -30,7 +33,7 @@ RUN buildDeps='ca-certificates \
 #                libssl-dev \
 #                mercurial \
 #                git-core \
-#
+
 # iptables-persistent libc6-i386
 
 # Install Go binary
