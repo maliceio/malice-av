@@ -3,14 +3,12 @@ FROM debian:jessie
 MAINTAINER blacktop, https://github.com/blacktop
 
 # Install Requirements
-COPY sav-linux-free-9.tgz /tmp/sav-linux-free-9.tgz
-RUN buildDeps='ca-certificates wget file' \
+RUN buildDeps='ca-certificates wget' \
   && apt-get update -qq \
   && apt-get install -yq $buildDeps \
   && echo "Install Sophos..." \
   && cd /tmp \
-  && ls -lah \
-  && file sav-linux-free-9.tgz \
+  && wget https://github.com/maliceio/malice-av/raw/master/sophos/sav-linux-free-9.tgz \
   && tar xzvf sav-linux-free-9.tgz \
   && ./sophos-av/install.sh /opt/sophos --update-free --acceptlicence --autostart=False --enableOnBoot=False --automatic --ignore-existing-installation --update-source-type=s \
   && echo "Clean up unnecessary files..." \
