@@ -76,17 +76,12 @@ This will output to stdout and POST to malice results API webhook endpoint.
 
 ---
 
-### To Run on OSX
-
--	Install [Homebrew](http://brew.sh)
+### To write results to [ElasticSearch](https://www.elastic.co/products/elasticsearch)
 
 ```bash
-$ brew install caskroom/cask/brew-cask
-$ brew cask install virtualbox
-$ brew install docker
-$ brew install docker-machine
-$ docker-machine create --driver virtualbox malice
-$ eval $(docker-machine env malice)
+$ docker volume create --name malice
+$ docker run -d -p 9200:9200 -v malice:/data --name elastic elasticsearch
+$ docker run --rm -v /path/to/malware:/malware:ro --link elastic malice/avg -t FILE
 ```
 
 ### Documentation
@@ -108,8 +103,6 @@ $ docker run --rm malice/avg:updated EICAR
 ### Issues
 
 Find a bug? Want more features? Find something missing in the documentation? Let me know! Please don't hesitate to [file an issue](https://github.com/maliceio/malice-av/issues/new) and I'll get right on it.
-
-### Credits
 
 ### License
 

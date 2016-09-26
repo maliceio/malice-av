@@ -12,9 +12,11 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/crackcomm/go-clitable"
+	"github.com/fatih/structs"
+	"github.com/maliceio/go-plugin-utils/utils"
+	"github.com/maliceio/malice/malice/database/elasticsearch"
 	"github.com/parnurzeal/gorequest"
 	"github.com/urfave/cli"
-	r "gopkg.in/dancannon/gorethink.v2"
 )
 
 // Version stores the plugin's version
@@ -45,31 +47,6 @@ type ResultsData struct {
 	Engine   string `json:"engine" gorethink:"engine"`
 	Database string `json:"database" gorethink:"database"`
 	Updated  string `json:"updated" gorethink:"updated"`
-}
-
-func getopt(name, dfault string) string {
-	value := os.Getenv(name)
-	if value == "" {
-		value = dfault
-	}
-	return value
-}
-
-func assert(err error) {
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-// RunCommand runs cmd on file
-func RunCommand(cmd string, args ...string) string {
-
-	cmdOut, err := exec.Command(cmd, args...).Output()
-	if len(cmdOut) == 0 {
-		assert(err)
-	}
-
-	return string(cmdOut)
 }
 
 // ParseAVGOutput convert avg output into ResultsData struct
@@ -129,7 +106,7 @@ func ParseAVGOutput(avgout string, path string) (ResultsData, error) {
 
 // Get Anti-Virus scanner version
 func getAvgVersion() string {
-	versionOut := RunCommand("/usr/bin/avgscan", "-v")
+	versionOut := utils.RunCommand("/usr/bin/avgscan", "-v")
 	lines := strings.Split(versionOut, "\n")
 	for _, line := range lines {
 		if len(line) != 0 {
@@ -155,7 +132,7 @@ func getUpdatedDate() string {
 		return BuildTime
 	}
 	updated, err := ioutil.ReadFile("/opt/malice/UPDATED")
-	assert(err)
+	utils.Assert(err)
 	return string(updated)
 }
 
@@ -168,7 +145,7 @@ func updateAV() error {
 	// AVG needs to have the daemon started first
 	exec.Command("/etc/init.d/avgd", "start").Output()
 
-	fmt.Println(RunCommand("avgupdate"))
+	fmt.Println(utils.RunCommand("avgupdate"))
 	// Update UPDATED file
 	t := time.Now().Format("20060102")
 	err := ioutil.WriteFile("/opt/malice/UPDATED", []byte(t), 0644)
@@ -187,44 +164,6 @@ func printMarkDownTable(avg AVG) {
 	})
 	table.Markdown = true
 	table.Print()
-}
-
-// writeToDatabase upserts plugin results into Database
-func writeToDatabase(results pluginResults) {
-
-	// connect to RethinkDB
-	session, err := r.Connect(r.ConnectOpts{
-		Address:  fmt.Sprintf("%s:28015", getopt("MALICE_RETHINKDB", "rethink")),
-		Timeout:  5 * time.Second,
-		Database: "malice",
-	})
-	if err != nil {
-		log.Debug(err)
-		return
-	}
-	defer session.Close()
-
-	res, err := r.Table("samples").Get(results.ID).Run(session)
-	assert(err)
-	defer res.Close()
-
-	if res.IsNil() {
-		// upsert into RethinkDB
-		resp, err := r.Table("samples").Insert(results, r.InsertOpts{Conflict: "replace"}).RunWrite(session)
-		assert(err)
-		log.Debug(resp)
-	} else {
-		resp, err := r.Table("samples").Get(results.ID).Update(map[string]interface{}{
-			"plugins": map[string]interface{}{
-				category: map[string]interface{}{
-					name: results.Data,
-				},
-			},
-		}).RunWrite(session)
-		assert(err)
-
-		log.Debug(resp)
-	}
 }
 
 var appHelpTemplate = `Usage: {{.Name}} {{if .Flags}}[OPTIONS] {{end}}COMMAND [arg...]
@@ -255,22 +194,24 @@ func main() {
 	app.Version = Version + ", BuildTime: " + BuildTime
 	app.Compiled, _ = time.Parse("20060102", BuildTime)
 	app.Usage = "Malice AVG AntiVirus Plugin"
-	var rethinkdb string
+	var elasitcsearch string
+	var table bool
 	app.Flags = []cli.Flag{
 		cli.BoolFlag{
 			Name:  "verbose, V",
 			Usage: "verbose output",
 		},
 		cli.StringFlag{
-			Name:        "rethinkdb",
+			Name:        "elasitcsearch",
 			Value:       "",
-			Usage:       "rethinkdb address for Malice to store results",
-			EnvVar:      "MALICE_RETHINKDB",
-			Destination: &rethinkdb,
+			Usage:       "elasitcsearch address for Malice to store results",
+			EnvVar:      "MALICE_ELASTICSEARCH",
+			Destination: &elasitcsearch,
 		},
 		cli.BoolFlag{
-			Name:  "table, t",
-			Usage: "output as Markdown table",
+			Name:        "table, t",
+			Usage:       "output as Markdown table",
+			Destination: &table,
 		},
 		cli.BoolFlag{
 			Name:   "post, p",
@@ -297,13 +238,11 @@ func main() {
 		path := c.Args().First()
 
 		if _, err := os.Stat(path); os.IsNotExist(err) {
-			assert(err)
+			utils.Assert(err)
 		}
 
 		if c.Bool("verbose") {
 			log.SetLevel(log.DebugLevel)
-		} else {
-			r.Log.Out = ioutil.Discard
 		}
 
 		// AVG needs to have the daemon started first
@@ -313,22 +252,31 @@ func main() {
 
 		var results ResultsData
 
-		results, err := ParseAVGOutput(RunCommand("/usr/bin/avgscan", path), path)
+		results, err := ParseAVGOutput(utils.RunCommand("/usr/bin/avgscan", path), path)
 		if err != nil {
 			// If fails try a second time
-			results, err = ParseAVGOutput(RunCommand("/usr/bin/avgscan", path), path)
-			assert(err)
+			results, err = ParseAVGOutput(utils.RunCommand("/usr/bin/avgscan", path), path)
+			utils.Assert(err)
 		}
 
 		avg := AVG{
 			Results: results,
 		}
 
-		if c.Bool("table") {
+		// upsert into Database
+		elasticsearch.InitElasticSearch()
+		elasticsearch.WritePluginResultsToDatabase(elasticsearch.PluginResults{
+			ID:       utils.Getopt("MALICE_SCANID", utils.GetSHA256(path)),
+			Name:     name,
+			Category: category,
+			Data:     structs.Map(avg.Results),
+		})
+
+		if table {
 			printMarkDownTable(avg)
 		} else {
 			avgJSON, err := json.Marshal(avg)
-			assert(err)
+			utils.Assert(err)
 			if c.Bool("post") {
 				request := gorequest.New()
 				if c.Bool("proxy") {
@@ -345,5 +293,5 @@ func main() {
 	}
 
 	err := app.Run(os.Args)
-	assert(err)
+	utils.Assert(err)
 }
