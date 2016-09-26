@@ -11,6 +11,8 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/crackcomm/go-clitable"
+	"github.com/fatih/structs"
+	"github.com/maliceio/go-plugin-utils/database/elasticsearch"
 	"github.com/maliceio/go-plugin-utils/utils"
 	"github.com/parnurzeal/gorequest"
 	"github.com/urfave/cli"
@@ -213,43 +215,6 @@ func printMarkDownTable(fsecure FSecure) {
 	table.Print()
 }
 
-// writeToDatabase upserts plugin results into Database
-func writeToDatabase(results pluginResults) {
-	// connect to RethinkDB
-	session, err := r.Connect(r.ConnectOpts{
-		Address:  fmt.Sprintf("%s:28015", utils.Getopt("MALICE_RETHINKDB", "rethink")),
-		Timeout:  5 * time.Second,
-		Database: "malice",
-	})
-	if err != nil {
-		log.Debug(err)
-		return
-	}
-	defer session.Close()
-
-	res, err := r.Table("samples").Get(results.ID).Run(session)
-	utils.Assert(err)
-	defer res.Close()
-
-	if res.IsNil() {
-		// upsert into RethinkDB
-		resp, err := r.Table("samples").Insert(results, r.InsertOpts{Conflict: "replace"}).RunWrite(session)
-		utils.Assert(err)
-		log.Debug(resp)
-	} else {
-		resp, err := r.Table("samples").Get(results.ID).Update(map[string]interface{}{
-			"plugins": map[string]interface{}{
-				category: map[string]interface{}{
-					name: results.Data,
-				},
-			},
-		}).RunWrite(session)
-		utils.Assert(err)
-
-		log.Debug(resp)
-	}
-}
-
 var appHelpTemplate = `Usage: {{.Name}} {{if .Flags}}[OPTIONS] {{end}}COMMAND [arg...]
 
 {{.Usage}}
@@ -278,18 +243,18 @@ func main() {
 	app.Version = Version + ", BuildTime: " + BuildTime
 	app.Compiled, _ = time.Parse("20060102", BuildTime)
 	app.Usage = "Malice F-Secure AntiVirus Plugin"
-	var rethinkdb string
+	var elasitcsearch string
 	app.Flags = []cli.Flag{
 		cli.BoolFlag{
 			Name:  "verbose, V",
 			Usage: "verbose output",
 		},
 		cli.StringFlag{
-			Name:        "rethinkdb",
+			Name:        "elasitcsearch",
 			Value:       "",
-			Usage:       "rethinkdb address for Malice to store results",
-			EnvVar:      "MALICE_RETHINKDB",
-			Destination: &rethinkdb,
+			Usage:       "elasitcsearch address for Malice to store results",
+			EnvVar:      "MALICE_ELASTICSEARCH",
+			Destination: &elasitcsearch,
 		},
 		cli.BoolFlag{
 			Name:  "table, t",
@@ -337,15 +302,18 @@ func main() {
 			utils.Assert(err)
 		}
 
-		// upsert into Database
-		writeToDatabase(pluginResults{
-			ID:   utils.Getopt("MALICE_SCANID", utils.GetSHA256(path)),
-			Data: results,
-		})
-
 		fsecure := FSecure{
 			Results: results,
 		}
+
+		// upsert into Database
+		elasticsearch.InitElasticSearch()
+		elasticsearch.WritePluginResultsToDatabase(elasticsearch.PluginResults{
+			ID:       utils.Getopt("MALICE_SCANID", utils.GetSHA256(path)),
+			Name:     name,
+			Category: category,
+			Data:     structs.Map(fsecure.Results),
+		})
 
 		if c.Bool("table") {
 			printMarkDownTable(fsecure)
