@@ -29,8 +29,8 @@ const (
 )
 
 type pluginResults struct {
-	ID   string      `json:"id" gorethink:"id,omitempty"`
-	Data ResultsData `json:"clamav" gorethink:"clamav"`
+	ID   string      `json:"id" structs:"id,omitempty"`
+	Data ResultsData `json:"clamav" structs:"clamav"`
 }
 
 // ClamAV json object
@@ -40,11 +40,11 @@ type ClamAV struct {
 
 // ResultsData json object
 type ResultsData struct {
-	Infected bool   `json:"infected" gorethink:"infected"`
-	Result   string `json:"result" gorethink:"result"`
-	Engine   string `json:"engine" gorethink:"engine"`
-	Known    string `json:"known" gorethink:"known"`
-	Updated  string `json:"updated" gorethink:"updated"`
+	Infected bool   `json:"infected" structs:"infected"`
+	Result   string `json:"result" structs:"result"`
+	Engine   string `json:"engine" structs:"engine"`
+	Known    string `json:"known" structs:"known"`
+	Updated  string `json:"updated" structs:"updated"`
 }
 
 // ParseClamAvOutput convert clamav output into ClamAV struct

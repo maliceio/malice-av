@@ -16,7 +16,6 @@ import (
 	"github.com/maliceio/go-plugin-utils/utils"
 	"github.com/parnurzeal/gorequest"
 	"github.com/urfave/cli"
-	r "gopkg.in/dancannon/gorethink.v2"
 )
 
 // Version stores the plugin's version
@@ -31,8 +30,8 @@ const (
 )
 
 type pluginResults struct {
-	ID   string      `json:"id" gorethink:"id,omitempty"`
-	Data ResultsData `json:"f-prot" gorethink:"f-prot"`
+	ID   string      `json:"id" structs:"id,omitempty"`
+	Data ResultsData `json:"f-prot" structs:"f-prot"`
 }
 
 // FPROT json object
@@ -42,10 +41,10 @@ type FPROT struct {
 
 // ResultsData json object
 type ResultsData struct {
-	Infected bool   `json:"infected" gorethink:"infected"`
-	Result   string `json:"result" gorethink:"result"`
-	Engine   string `json:"engine" gorethink:"engine"`
-	Updated  string `json:"updated" gorethink:"updated"`
+	Infected bool   `json:"infected" structs:"infected"`
+	Result   string `json:"result" structs:"result"`
+	Engine   string `json:"engine" structs:"engine"`
+	Updated  string `json:"updated" structs:"updated"`
 }
 
 // ParseFprotOutput convert fprot output into ResultsData struct
@@ -226,8 +225,6 @@ func main() {
 		}
 		if c.Bool("verbose") {
 			log.SetLevel(log.DebugLevel)
-		} else {
-			r.Log.Out = ioutil.Discard
 		}
 
 		fprot := FPROT{

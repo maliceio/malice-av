@@ -30,8 +30,8 @@ const (
 )
 
 type pluginResults struct {
-	ID   string      `json:"id" gorethink:"id,omitempty"`
-	Data ResultsData `json:"bitdefender" gorethink:"bitdefender"`
+	ID   string      `json:"id" structs:"id,omitempty"`
+	Data ResultsData `json:"bitdefender" structs:"bitdefender"`
 }
 
 // Bitdefender json object
@@ -41,10 +41,10 @@ type Bitdefender struct {
 
 // ResultsData json object
 type ResultsData struct {
-	Infected bool   `json:"infected" gorethink:"infected"`
-	Result   string `json:"result" gorethink:"result"`
-	Engine   string `json:"engine" gorethink:"engine"`
-	Updated  string `json:"updated" gorethink:"updated"`
+	Infected bool   `json:"infected" structs:"infected"`
+	Result   string `json:"result" structs:"result"`
+	Engine   string `json:"engine" structs:"engine"`
+	Updated  string `json:"updated" structs:"updated"`
 }
 
 // ParseBitdefenderOutput convert bitdefender output into ResultsData struct

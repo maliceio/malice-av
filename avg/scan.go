@@ -31,8 +31,8 @@ const (
 )
 
 type pluginResults struct {
-	ID   string      `json:"id" gorethink:"id,omitempty"`
-	Data ResultsData `json:"avast" gorethink:"avg"`
+	ID   string      `json:"id" structs:"id,omitempty"`
+	Data ResultsData `json:"avast" structs:"avg"`
 }
 
 // AVG json object
@@ -42,11 +42,11 @@ type AVG struct {
 
 // ResultsData json object
 type ResultsData struct {
-	Infected bool   `json:"infected" gorethink:"infected"`
-	Result   string `json:"result" gorethink:"result"`
-	Engine   string `json:"engine" gorethink:"engine"`
-	Database string `json:"database" gorethink:"database"`
-	Updated  string `json:"updated" gorethink:"updated"`
+	Infected bool   `json:"infected" structs:"infected"`
+	Result   string `json:"result" structs:"result"`
+	Engine   string `json:"engine" structs:"engine"`
+	Database string `json:"database" structs:"database"`
+	Updated  string `json:"updated" structs:"updated"`
 }
 
 // ParseAVGOutput convert avg output into ResultsData struct

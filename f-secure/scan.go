@@ -16,7 +16,6 @@ import (
 	"github.com/maliceio/go-plugin-utils/utils"
 	"github.com/parnurzeal/gorequest"
 	"github.com/urfave/cli"
-	r "gopkg.in/dancannon/gorethink.v2"
 )
 
 // Version stores the plugin's version
@@ -31,8 +30,8 @@ const (
 )
 
 type pluginResults struct {
-	ID   string      `json:"id" gorethink:"id,omitempty"`
-	Data ResultsData `json:"f-secure" gorethink:"f-secure"`
+	ID   string      `json:"id" structs:"id,omitempty"`
+	Data ResultsData `json:"f-secure" structs:"f-secure"`
 }
 
 // FSecure json object
@@ -42,17 +41,17 @@ type FSecure struct {
 
 // ResultsData json object
 type ResultsData struct {
-	Infected bool        `json:"infected" gorethink:"infected"`
-	Engines  ScanEngines `json:"results" gorethink:"results"`
-	Engine   string      `json:"engine" gorethink:"engine"`
-	Database string      `json:"database" gorethink:"database"`
-	Updated  string      `json:"updated" gorethink:"updated"`
+	Infected bool        `json:"infected" structs:"infected"`
+	Engines  ScanEngines `json:"results" structs:"results"`
+	Engine   string      `json:"engine" structs:"engine"`
+	Database string      `json:"database" structs:"database"`
+	Updated  string      `json:"updated" structs:"updated"`
 }
 
 // ScanEngines scan engine results
 type ScanEngines struct {
-	FSE      string `json:"fse" gorethink:"fse"`
-	Aquarius string `json:"aquarius" gorethink:"aquarius"`
+	FSE      string `json:"fse" structs:"fse"`
+	Aquarius string `json:"aquarius" structs:"aquarius"`
 }
 
 // ParseFSecureOutput convert fsecure output into ResultsData struct
@@ -289,8 +288,6 @@ func main() {
 		}
 		if c.Bool("verbose") {
 			log.SetLevel(log.DebugLevel)
-		} else {
-			r.Log.Out = ioutil.Discard
 		}
 
 		var results ResultsData
