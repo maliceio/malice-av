@@ -35,7 +35,6 @@ RUN /etc/init.d/fsaua start \
 COPY . /go/src/github.com/maliceio/malice-fsecure
 RUN buildDeps='ca-certificates \
                build-essential \
-               golang-go \
                mercurial \
                git-core \
                wget' \

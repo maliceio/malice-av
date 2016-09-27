@@ -8,7 +8,6 @@ ENV GO_VERSION 1.7.1
 COPY . /go/src/github.com/maliceio/malice-avg
 RUN buildDeps='ca-certificates \
                build-essential \
-               golang-go \
                mercurial \
                git-core \
                unzip \
