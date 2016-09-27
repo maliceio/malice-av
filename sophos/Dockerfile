@@ -2,6 +2,8 @@ FROM debian:jessie
 
 MAINTAINER blacktop, https://github.com/blacktop
 
+ENV GO_VERSION 1.7.1
+
 # Install Requirements
 RUN buildDeps='ca-certificates wget' \
   && apt-get update -qq \
@@ -20,21 +22,26 @@ RUN buildDeps='ca-certificates wget' \
 COPY . /go/src/github.com/maliceio/malice-sophos
 RUN buildDeps='ca-certificates \
                build-essential \
-               golang-go \
                mercurial \
-               git-core' \
+               git-core \
+               wget' \
   && apt-get update -qq \
   && apt-get install -yq $buildDeps --no-install-recommends \
+  && echo "Install Go..." \
+  && cd /tmp \
+  && wget https://storage.googleapis.com/golang/go$GO_VERSION.linux-amd64.tar.gz \
+  && tar -C /usr/local -xzf go$GO_VERSION.linux-amd64.tar.gz \
+  && export PATH=$PATH:/usr/local/go/bin \
   && echo "Building sophos malscan Go binary..." \
   && cd /go/src/github.com/maliceio/malice-sophos \
   && export GOPATH=/go \
   && go version \
   && go get \
-  && go build -ldflags "-X main.Version $(cat VERSION) -X main.BuildTime $(date -u +%Y%m%d)" -o /bin/malscan \
+  && go build -ldflags "-X main.Version=$(cat VERSION) -X main.BuildTime=$(date -u +%Y%m%d)" -o /bin/malscan \
   && echo "Clean up unnecessary files..." \
   && apt-get purge -y --auto-remove $buildDeps \
   && apt-get clean \
-  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /go
+  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /go /usr/local/go
 
 # Update Sophos
 RUN /opt/sophos/update/savupdate.sh

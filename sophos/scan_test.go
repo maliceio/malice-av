@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/cloudflare/cfssl/log"
+	log "github.com/Sirupsen/logrus"
 )
 
 const resultString = `SAVScan virus detection utility
