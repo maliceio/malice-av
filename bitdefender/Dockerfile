@@ -2,7 +2,7 @@ FROM ubuntu:precise
 
 MAINTAINER blacktop, https://github.com/blacktop
 
-ENV GO_VERSION 1.6
+ENV GO_VERSION 1.7.1
 
 COPY . /go/src/github.com/maliceio/malice-bitdefender
 RUN buildDeps='ca-certificates \
@@ -26,8 +26,8 @@ RUN buildDeps='ca-certificates \
   && bash /go/src/github.com/maliceio/malice-bitdefender/bd_fix.sh \
   && echo "Install Go..." \
   && ARCH="$(dpkg --print-architecture)" \
-  && wget https://storage.googleapis.com/golang/go$GO_VERSION.linux-$ARCH.tar.gz \
-  && tar -C /usr/local -xzf go$GO_VERSION.linux-$ARCH.tar.gz \
+  && wget https://storage.googleapis.com/golang/go$GO_VERSION.linux-$ARCH.tar.gz -O /tmp/go.tar.gz \
+  && tar -C /usr/local -xzf /tmp/go.tar.gz \
   && echo "Building malice-bitdefender Go binary..." \
   && cd /go/src/github.com/maliceio/malice-bitdefender \
   && export PATH=$PATH:/usr/local/go/bin \

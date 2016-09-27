@@ -2,6 +2,7 @@ FROM debian:jessie
 
 MAINTAINER blacktop, https://github.com/blacktop
 
+ENV GO_VERSION 1.7.1
 ENV FSECURE_VERSION 11.00.79-rtm
 
 # Install Requirements
@@ -36,9 +37,14 @@ RUN buildDeps='ca-certificates \
                build-essential \
                golang-go \
                mercurial \
-               git-core' \
+               git-core \
+               wget' \
   && apt-get update -qq \
   && apt-get install -yq $buildDeps --no-install-recommends \
+  && echo "Install Go..." \
+  && ARCH="$(dpkg --print-architecture)" \
+  && wget https://storage.googleapis.com/golang/go$GO_VERSION.linux-$ARCH.tar.gz -O /tmp/go.tar.gz \
+  && tar -C /usr/local -xzf /tmp/go.tar.gz \
   && echo "Building drweb malscan Go binary..." \
   && cd /go/src/github.com/maliceio/malice-fsecure \
   && export GOPATH=/go \
@@ -48,7 +54,7 @@ RUN buildDeps='ca-certificates \
   && echo "Clean up unnecessary files..." \
   && apt-get purge -y --auto-remove $buildDeps \
   && apt-get clean \
-  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /go
+  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /go /usr/local/go
 
 # Add EICAR Test Virus File to malware folder
 ADD http://www.eicar.org/download/eicar.com.txt /malware/EICAR

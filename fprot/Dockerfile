@@ -2,6 +2,8 @@ FROM debian:jessie
 
 MAINTAINER blacktop, https://github.com/blacktop
 
+ENV GO_VERSION 1.7.1
+
 COPY . /go/src/github.com/maliceio/malice-fprot
 RUN buildDeps='ca-certificates \
                build-essential \
@@ -9,7 +11,7 @@ RUN buildDeps='ca-certificates \
                mercurial \
                git-core \
                unzip \
-               curl' \
+               wget' \
   && set -x \
   && apt-get update -qq \
   && apt-get install -yq $buildDeps libc6-i386 --no-install-recommends \
@@ -24,6 +26,10 @@ RUN buildDeps='ca-certificates \
   && chmod a+x /opt/f-prot/fpscan \
   && chmod u+x /opt/f-prot/fpupdate \
   && ln -fs /opt/f-prot/man_pages/scan-mail.pl.8 /usr/share/man/man8/ \
+  && echo "Install Go..." \
+  && ARCH="$(dpkg --print-architecture)" \
+  && wget https://storage.googleapis.com/golang/go$GO_VERSION.linux-$ARCH.tar.gz -O /tmp/go.tar.gz \
+  && tar -C /usr/local -xzf /tmp/go.tar.gz \
   && echo "Building info Go binary..." \
   && cd /go/src/github.com/maliceio/malice-fprot \
   && export GOPATH=/go \
@@ -33,7 +39,7 @@ RUN buildDeps='ca-certificates \
   && echo "Clean up unnecessary files..." \
   && apt-get purge -y --auto-remove $buildDeps \
   && apt-get clean \
-  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /go
+  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /go /usr/local/go
 
 # Add EICAR Test Virus File to malware folder
 ADD http://www.eicar.org/download/eicar.com.txt /malware/EICAR
