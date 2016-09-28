@@ -25,12 +25,12 @@ RUN buildDeps='ca-certificates \
   && curl -Ls https://storage.googleapis.com/golang/go$GO_VERSION.linux-amd64.tar.gz > /tmp/go.tar.gz \
   && tar -C /usr/local -xzf /tmp/go.tar.gz \
   && export PATH=$PATH:/usr/local/go/bin \
-  && echo "Building info Go binary..." \
+  && echo "Building avscan Go binary..." \
   && cd /go/src/github.com/maliceio/malice-avg \
 	&& export GOPATH=/go \
   && go version \
 	&& go get \
-	&& go build -ldflags "-X main.Version $(cat VERSION) -X main.BuildTime $(date -u +%Y%m%d)" -o /bin/scan \
+  && go build -ldflags "-X main.Version=$(cat VERSION) -X main.BuildTime=$(date -u +%Y%m%d)" -o /bin/avscan \
   && echo "Clean up unnecessary files..." \
   && apt-get purge -y --auto-remove $buildDeps \
   && apt-get clean \
@@ -44,6 +44,6 @@ RUN /etc/init.d/avgd restart && avgupdate
 
 WORKDIR /malware
 
-ENTRYPOINT ["/bin/scan"]
+ENTRYPOINT ["/bin/avscan"]
 
 CMD ["--help"]
