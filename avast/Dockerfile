@@ -18,27 +18,32 @@ RUN \
 # Install Go binary
 COPY . /go/src/github.com/maliceio/malice-avast
 RUN buildDeps='build-essential \
-               golang-go \
                mercurial \
-               git-core' \
+               git-core \
+               wget' \
     && apt-get update -qq \
     && apt-get install -yq $buildDeps --no-install-recommends \
-    && echo "Building avast malscan Go binary..." \
+    && echo "Install Go..." \
+    && ARCH="$(dpkg --print-architecture)" \
+    && wget https://storage.googleapis.com/golang/go$GO_VERSION.linux-$ARCH.tar.gz -O /tmp/go.tar.gz \
+    && tar -C /usr/local -xzf /tmp/go.tar.gz \
+    && export PATH=$PATH:/usr/local/go/bin \
+    && echo "Building avscan Go binary..." \
     && cd /go/src/github.com/maliceio/malice-avast \
     && export GOPATH=/go \
     && go version \
     && go get \
-    && go build -ldflags "-X main.Version $(cat VERSION) -X main.BuildTime $(date -u +%Y%m%d)" -o /bin/malscan \
+    && go build -ldflags "-X main.Version=$(cat VERSION) -X main.BuildTime=$(date -u +%Y%m%d)" -o /bin/avscan \
     && echo "Clean up unnecessary files..." \
     && apt-get purge -y --auto-remove $buildDeps \
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /go
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /go /usr/local/go
 
 COPY eicar.com.txt /malware/EICAR
 
 WORKDIR /malware
 
-ENTRYPOINT ["/bin/malscan"]
+ENTRYPOINT ["/bin/avscan"]
 
 CMD ["--help"]
 

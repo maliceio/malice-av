@@ -24,7 +24,7 @@ RUN buildDeps='ca-certificates \
                build-essential \
                mercurial \
                git-core \
-               curl' \
+               wget' \
   && apt-get update -qq \
   && apt-get install -yq $buildDeps --no-install-recommends \
   && echo "Install Go..." \
