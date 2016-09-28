@@ -32,12 +32,12 @@ RUN buildDeps='ca-certificates \
   && wget https://storage.googleapis.com/golang/go$GO_VERSION.linux-$ARCH.tar.gz -O /tmp/go.tar.gz \
   && tar -C /usr/local -xzf /tmp/go.tar.gz \
   && export PATH=$PATH:/usr/local/go/bin \
-  && echo "Building sophos malscan Go binary..." \
+  && echo "Building sophos avscan Go binary..." \
   && cd /go/src/github.com/maliceio/malice-sophos \
   && export GOPATH=/go \
   && go version \
   && go get \
-  && go build -ldflags "-X main.Version=$(cat VERSION) -X main.BuildTime=$(date -u +%Y%m%d)" -o /bin/malscan \
+  && go build -ldflags "-X main.Version=$(cat VERSION) -X main.BuildTime=$(date -u +%Y%m%d)" -o /bin/avscan \
   && echo "Clean up unnecessary files..." \
   && apt-get purge -y --auto-remove $buildDeps \
   && apt-get clean \
@@ -51,6 +51,6 @@ ADD http://www.eicar.org/download/eicar.com.txt /malware/EICAR
 
 WORKDIR /malware
 
-ENTRYPOINT ["/bin/malscan"]
+ENTRYPOINT ["/bin/avscan"]
 
 CMD ["--help"]
