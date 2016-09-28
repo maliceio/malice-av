@@ -44,6 +44,7 @@ RUN buildDeps='ca-certificates \
   && ARCH="$(dpkg --print-architecture)" \
   && wget https://storage.googleapis.com/golang/go$GO_VERSION.linux-$ARCH.tar.gz -O /tmp/go.tar.gz \
   && tar -C /usr/local -xzf /tmp/go.tar.gz \
+  && export PATH=$PATH:/usr/local/go/bin \
   && echo "Building drweb malscan Go binary..." \
   && cd /go/src/github.com/maliceio/malice-fsecure \
   && export GOPATH=/go \
