@@ -77,25 +77,12 @@ This will output to stdout and POST to malice results API webhook endpoint.
 
 ---
 
-### To write results to [RethinkDB](https://rethinkdb.com)
+### To write results to [ElasticSearch](https://www.elastic.co/products/elasticsearch)
 
 ```bash
 $ docker volume create --name malice
-$ docker run -d -p 28015:28015 -p 8080:8080 -v malice:/data --name rethink rethinkdb
-$ docker run --rm -v /path/to/malware:/malware:ro --link rethink:rethink malice/avast -t FILE
-```
-
-### To Run on OSX
-
--	Install [Homebrew](http://brew.sh)
-
-```bash
-$ brew install caskroom/cask/brew-cask
-$ brew cask install virtualbox
-$ brew install docker
-$ brew install docker-machine
-$ docker-machine create --driver virtualbox malice
-$ eval $(docker-machine env malice)
+$ docker run -d -p 9200:9200 -v malice:/data --name elastic elasticsearch
+$ docker run --rm -v /path/to/malware:/malware:ro --link elastic malice/avast -t FILE
 ```
 
 ### Documentation
@@ -133,8 +120,6 @@ $ docker run --rm malice/avast:updated EICAR
 ### Issues
 
 Find a bug? Want more features? Find something missing in the documentation? Let me know! Please don't hesitate to [file an issue](https://github.com/maliceio/malice-av/issues/new) and I'll get right on it.
-
-### Credits
 
 ### TODO
  - [x] Add Docs for how to add your own Avast License
