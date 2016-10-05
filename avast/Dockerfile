@@ -5,7 +5,7 @@ MAINTAINER blacktop, https://github.com/blacktop
 
 ENV GO_VERSION 1.7.1
 # ENV AVAST_VERSION 2.0.0-1
-# ENV AVAST_VERSION 2.1.1-1 =$AVAST_VERSION 
+# ENV AVAST_VERSION 2.1.1-1 =$AVAST_VERSION
 
 # Install Avast AV
 COPY license.avastlic /etc/avast/license.avastlic
@@ -13,7 +13,7 @@ RUN \
     echo "Install Avast..." \
     && echo 'deb http://deb.avast.com/lin/repo debian release' >> /etc/apt/sources.list \
     && apt-key adv --fetch-keys http://files.avast.com/files/resellers/linux/avast.gpg \
-    && apt-get update -q && apt-get install -y libc6-i386 avast \
+    && apt-get update -q && apt-get install -y lsb-release avast \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
