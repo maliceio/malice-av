@@ -2,7 +2,7 @@ FROM debian:jessie
 
 MAINTAINER blacktop, https://github.com/blacktop
 
-ENV GO_VERSION 1.7.1
+ENV GO_VERSION 1.7.3
 
 # Install Requirements
 RUN buildDeps='ca-certificates wget' \

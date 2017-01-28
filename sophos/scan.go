@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -48,7 +49,7 @@ type ResultsData struct {
 }
 
 // ParseSophosOutput convert sophos output into ResultsData struct
-func ParseSophosOutput(sophosout string, path string) (ResultsData, error) {
+func ParseSophosOutput(sophosout string, err error, errpath string) (ResultsData, error) {
 
 	// root@0e01fb905ffb:/malware# savscan -f EICAR
 	// SAVScan virus detection utility
@@ -70,6 +71,10 @@ func ParseSophosOutput(sophosout string, path string) (ResultsData, error) {
 	// If you need further advice regarding any detections please visit our
 	// Threat Center at: http://www.sophos.com/en-us/threat-center.aspx
 	// End of Scan.
+
+	if err != nil {
+		return ResultsData{}, err
+	}
 
 	version, database := getSophosVersion()
 
@@ -108,7 +113,9 @@ func getSophosVersion() (version string, database string) {
 	// Platform                  : Linux/AMD64
 	// Released                  : 26 April 2016
 	// Total viruses (with IDEs) : 11283995
-	versionOut := utils.RunCommand("/opt/sophos/bin/savscan", "--version")
+	versionOut, err := utils.RunCommand(nil, "/opt/sophos/bin/savscan", "--version")
+	utils.Assert(err)
+
 	return parseSophosVersion(versionOut)
 }
 
@@ -158,7 +165,7 @@ func printStatus(resp gorequest.Response, body string, errs []error) {
 	fmt.Println(resp.Status)
 }
 
-func updateAV() error {
+func updateAV(ctx context.Context) error {
 	fmt.Println("Updating Sophos...")
 	// root@0e01fb905ffb:/opt/sophos/update# ./savupdate.sh
 	// Updating from versions - SAV: 9.12.1, Engine: 3.64.0, Data: 5.27
@@ -176,12 +183,14 @@ func updateAV() error {
 	// Update completed.
 	// Updated to versions - SAV: 9.12.2, Engine: 3.65.2, Data: 5.30
 	// Successfully updated Sophos Anti-Virus from sdds:SOPHOS
+	output, err := utils.RunCommand(ctx, "/opt/sophos/update/savupdate.sh")
+	utils.Assert(err)
 
-	fmt.Println(utils.RunCommand("/opt/sophos/update/savupdate.sh"))
+	fmt.Println(output)
 
 	// Update UPDATED file
 	t := time.Now().Format("20060102")
-	err := ioutil.WriteFile("/opt/malice/UPDATED", []byte(t), 0644)
+	err = ioutil.WriteFile("/opt/malice/UPDATED", []byte(t), 0644)
 	return err
 }
 
@@ -199,27 +208,11 @@ func printMarkDownTable(sophos Sophos) {
 	table.Print()
 }
 
-var appHelpTemplate = `Usage: {{.Name}} {{if .Flags}}[OPTIONS] {{end}}COMMAND [arg...]
-
-{{.Usage}}
-
-Version: {{.Version}}{{if or .Author .Email}}
-
-Author:{{if .Author}}
-  {{.Author}}{{if .Email}} - <{{.Email}}>{{end}}{{else}}
-  {{.Email}}{{end}}{{end}}
-{{if .Flags}}
-Options:
-  {{range .Flags}}{{.}}
-  {{end}}{{end}}
-Commands:
-  {{range .Commands}}{{.Name}}{{with .ShortName}}, {{.}}{{end}}{{ "\t" }}{{.Usage}}
-  {{end}}
-Run '{{.Name}} COMMAND --help' for more information on a command.
-`
-
 func main() {
-	cli.AppHelpTemplate = appHelpTemplate
+
+	var elastic string
+
+	cli.AppHelpTemplate = utils.AppHelpTemplate
 	app := cli.NewApp()
 	app.Name = "sophos"
 	app.Author = "blacktop"
@@ -227,7 +220,6 @@ func main() {
 	app.Version = Version + ", BuildTime: " + BuildTime
 	app.Compiled, _ = time.Parse("20060102", BuildTime)
 	app.Usage = "Malice Sophos AntiVirus Plugin"
-	var elasitcsearch string
 	app.Flags = []cli.Flag{
 		cli.BoolFlag{
 			Name:  "verbose, V",
@@ -238,7 +230,7 @@ func main() {
 			Value:       "",
 			Usage:       "elasitcsearch address for Malice to store results",
 			EnvVar:      "MALICE_ELASTICSEARCH",
-			Destination: &elasitcsearch,
+			Destination: &elastic,
 		},
 		cli.BoolFlag{
 			Name:  "table, t",
@@ -254,6 +246,12 @@ func main() {
 			Usage:  "proxy settings for Malice webhook endpoint",
 			EnvVar: "MALICE_PROXY",
 		},
+		cli.IntFlag{
+			Name:   "timeout",
+			Value:  10,
+			Usage:  "malice plugin timeout (in seconds)",
+			EnvVar: "MALICE_TIMEOUT",
+		},
 	}
 	app.Commands = []cli.Command{
 		{
@@ -261,11 +259,17 @@ func main() {
 			Aliases: []string{"u"},
 			Usage:   "Update virus definitions",
 			Action: func(c *cli.Context) error {
-				return updateAV()
+				ctx, cancel := context.WithTimeout(context.Background(), time.Duration(c.Int("timeout"))*time.Second)
+				defer cancel()
+				return updateAV(ctx)
 			},
 		},
 	}
 	app.Action = func(c *cli.Context) error {
+
+		ctx, cancel := context.WithTimeout(context.Background(), time.Duration(c.Int("timeout"))*time.Second)
+		defer cancel()
+
 		path := c.Args().First()
 
 		if _, err := os.Stat(path); os.IsNotExist(err) {
@@ -276,11 +280,12 @@ func main() {
 		}
 
 		var results ResultsData
-
-		results, err := ParseSophosOutput(utils.RunCommand("savscan", "-f", path), path)
+		output, err := utils.RunCommand(ctx, "savscan", "-f", path)
+		results, err = ParseSophosOutput(output, err, path)
 		if err != nil {
 			// If fails try a second time
-			results, err = ParseSophosOutput(utils.RunCommand("savscan", "-f", path), path)
+			output, err := utils.RunCommand(ctx, "savscan", "-f", path)
+			results, err = ParseSophosOutput(output, err, path)
 			utils.Assert(err)
 		}
 
@@ -289,7 +294,7 @@ func main() {
 		}
 
 		// upsert into Database
-		elasticsearch.InitElasticSearch()
+		elasticsearch.InitElasticSearch(elastic)
 		elasticsearch.WritePluginResultsToDatabase(elasticsearch.PluginResults{
 			ID:       utils.Getopt("MALICE_SCANID", utils.GetSHA256(path)),
 			Name:     name,
@@ -308,9 +313,11 @@ func main() {
 					request = gorequest.New().Proxy(os.Getenv("MALICE_PROXY"))
 				}
 				request.Post(os.Getenv("MALICE_ENDPOINT")).
-					Set("Task", path).
-					Send(sophosJSON).
+					Set("X-Malice-ID", utils.Getopt("MALICE_SCANID", utils.GetSHA256(path))).
+					Send(string(sophosJSON)).
 					End(printStatus)
+
+				return nil
 			}
 			fmt.Println(string(sophosJSON))
 		}
