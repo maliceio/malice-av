@@ -5,8 +5,6 @@ malice-av
 
 > **NOTE:** This repo only contains old POCs and AV installer files.  
 
-Click the links in this `README` to goto the AV's repo
-
 ### Plugins Included
 
 |                                              AV                                              |                                                             Docker Stars                                                              |                                                             Docker Pulls                                                              |       Status       | Key Required |
