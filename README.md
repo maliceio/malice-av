@@ -1,9 +1,8 @@
-malice-av
-=========
+# malice-av
 
 ### Collection of Malice AntiVirus Plugins
 
-> **NOTE:** This repo only contains old POCs and AV installer files.  
+> **NOTE:** This repo only contains old POCs and AV installer files.
 
 ### Plugins Included
 
@@ -19,9 +18,8 @@ malice-av
 |            [escan](https://github.com/malice-plugins/escan/blob/master/README.md)            |            [![Docker Stars](https://img.shields.io/docker/stars/malice/escan.svg)](https://hub.docker.com/r/malice/escan/)            |            [![Docker Pulls](https://img.shields.io/docker/pulls/malice/escan.svg)](https://hub.docker.com/r/malice/escan/)            | :white_check_mark: |              |
 |           [f-prot](https://github.com/malice-plugins/fprot/blob/master/README.md)            |            [![Docker Stars](https://img.shields.io/docker/stars/malice/fprot.svg)](https://hub.docker.com/r/malice/fprot/)            |            [![Docker Pulls](https://img.shields.io/docker/pulls/malice/fprot.svg)](https://hub.docker.com/r/malice/fprot/)            | :white_check_mark: |              |
 |         [f-secure](https://github.com/malice-plugins/fsecure/blob/master/README.md)          |          [![Docker Stars](https://img.shields.io/docker/stars/malice/fsecure.svg)](https://hub.docker.com/r/malice/fsecure/)          |          [![Docker Pulls](https://img.shields.io/docker/pulls/malice/fsecure.svg)](https://hub.docker.com/r/malice/fsecure/)          | :white_check_mark: |              |
-|        [kaspersky](https://github.com/malice-plugins/kaspersky/blob/master/README.md)        |        [![Docker Stars](https://img.shields.io/docker/stars/malice/kaspersky.svg)](https://hub.docker.com/r/malice/kaspersky/)        |        [![Docker Pulls](https://img.shields.io/docker/pulls/malice/kaspersky.svg)](https://hub.docker.com/r/malice/kaspersky/)        |   :construction:   |    :key:     |
-|           [mcafee](https://github.com/malice-plugins/mcafee/blob/master/README.md)           |           [![Docker Stars](https://img.shields.io/docker/stars/malice/mcafee.svg)](https://hub.docker.com/r/malice/mcafee/)           |           [![Docker Pulls](https://img.shields.io/docker/pulls/malice/mcafee.svg)](https://hub.docker.com/r/malice/mcafee/)           |   :white_check_mark:   |              |
+|        [kaspersky](https://github.com/malice-plugins/kaspersky/blob/master/README.md)        |        [![Docker Stars](https://img.shields.io/docker/stars/malice/kaspersky.svg)](https://hub.docker.com/r/malice/kaspersky/)        |        [![Docker Pulls](https://img.shields.io/docker/pulls/malice/kaspersky.svg)](https://hub.docker.com/r/malice/kaspersky/)        | :white_check_mark: |    :key:     |
+|           [mcafee](https://github.com/malice-plugins/mcafee/blob/master/README.md)           |           [![Docker Stars](https://img.shields.io/docker/stars/malice/mcafee.svg)](https://hub.docker.com/r/malice/mcafee/)           |           [![Docker Pulls](https://img.shields.io/docker/pulls/malice/mcafee.svg)](https://hub.docker.com/r/malice/mcafee/)           | :white_check_mark: |              |
 |           [sophos](https://github.com/malice-plugins/sophos/blob/master/README.md)           |           [![Docker Stars](https://img.shields.io/docker/stars/malice/sophos.svg)](https://hub.docker.com/r/malice/sophos/)           |           [![Docker Pulls](https://img.shields.io/docker/pulls/malice/sophos.svg)](https://hub.docker.com/r/malice/sophos/)           | :white_check_mark: |              |
 | [windows-defender](https://github.com/malice-plugins/windows-defender/blob/master/README.md) | [![Docker Stars](https://img.shields.io/docker/stars/malice/windows-defender.svg)](https://hub.docker.com/r/malice/windows-defender/) | [![Docker Pulls](https://img.shields.io/docker/pulls/malice/windows-defender.svg)](https://hub.docker.com/r/malice/windows-defender/) | :white_check_mark: |              |
 |            [zoner](https://github.com/malice-plugins/zoner/blob/master/README.md)            |            [![Docker Stars](https://img.shields.io/docker/stars/malice/zoner.svg)](https://hub.docker.com/r/malice/zoner/)            |            [![Docker Pulls](https://img.shields.io/docker/pulls/malice/zoner.svg)](https://hub.docker.com/r/malice/zoner/)            | :white_check_mark: |              |
-
